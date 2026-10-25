@@ -1,3 +1,17 @@
+## Yenilikler
+
+Kurs projesinin üzerine eklenen özellikler:
+
+- **Yeni tasarım:** gökyüzü mavisi tema, daha büyük ve kalın yazılar, açık / koyu / sistem teması seçimi.
+- **Türkçe ve İngilizce:** uygulama içinden dil seçimi; ilk açılışta Türkçe.
+- **Şehir arama:** sonuçları ülkeye göre süzme; arama metni ekran dönünce korunur.
+- **Tahmin ekranı:** havaya göre renklenen ana kart, saatlik tahminde saat aralığı filtresi (Sabah, Öğle, Akşam, Gece), "Şimdi" ve "Yarın" etiketleri, 7 günlük sıcaklık çubukları.
+- **Ne giymeli?:** sıcaklık, yağmur, rüzgâr ve UV'ye göre kıyafet önerileri ve "şemsiyeni al" gibi ipuçları.
+- **Güneş ve UV:** gün doğumu, gün batımı, gün uzunluğu ve renkli UV göstergesi.
+- **Polen ve Alerji:** 6 polen türü için uyarı ve 4 günlük renkli tablo (Avrupa ve Türkiye).
+- **Türkiye sıcaklık haritası:** 81 il bugünkü ortalama sıcaklığına göre renkli; bir ile dokunup tahminine geçilir.
+- **Hava Robotu:** ücretsiz, çevrimdışı çalışan, kurallara dayalı sohbet. Bir şehrin yağmurunu, sıcaklığını, kıyafetini, UV'sini sorabilir; "İzmir'de yarın yağmur var mı?" gibi sorulardaki şehri kendisi bulur.
+
 <div align="center">
 
 **Repoya erişim**
