@@ -1,10 +1,12 @@
 <div align="center">
 
-<img src="docs/qr-repo.png" alt="github.com/tc-yusufburakdemir/weather-app adresinin QR kodu" width="220">
-
 **Repoya erişim**
 
-[github.com/tc-yusufburakdemir/weather-app](https://github.com/tc-yusufburakdemir/weather-app)
+[github.com/SenaDemirci/GK-weather-app](https://github.com/SenaDemirci/GK-weather-app)
+
+```bash
+git clone https://github.com/SenaDemirci/GK-weather-app.git
+```
 
 </div>
 
