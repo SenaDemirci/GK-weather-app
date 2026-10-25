@@ -1,0 +1,133 @@
+<resources>
+    <!--
+      İngilizce metinler. Anahtarlar values/strings.xml ile birebir aynıdır;
+      Android dil İngilizce olduğunda bu dosyayı seçer.
+    -->
+
+    <string name="app_name">Weather</string>
+
+    <!-- City list screen -->
+    <string name="city_title">How\'s the weather?</string>
+    <string name="city_header_subtitle">Search for a city to see current conditions, hourly and 7-day forecasts.</string>
+    <string name="greeting_morning">Good morning</string>
+    <string name="greeting_day">Good afternoon</string>
+    <string name="greeting_evening">Good evening</string>
+    <string name="greeting_night">Good night</string>
+    <string name="search_hint">Type a city name (e.g. London)</string>
+    <string name="results_title">Results</string>
+    <string name="results_count">%1$d cities</string>
+    <string name="filter_all_countries">All countries</string>
+    <string name="unknown_country">Unknown country</string>
+    <string name="empty_city_title">We couldn\'t find a city with that name</string>
+    <string name="empty_city_message">Check the spelling or try a larger city nearby.</string>
+    <string name="action_clear">Clear</string>
+    <string name="action_retry">Try again</string>
+
+    <!-- Theme and language menus -->
+    <string name="theme_button">Theme: %1$s</string>
+    <string name="theme_system">System</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="language_button">Language: %1$s</string>
+    <string name="language_system">System language</string>
+
+    <!-- Error messages -->
+    <string name="error_connection">Check your internet connection.</string>
+    <string name="error_server">The server isn\'t responding right now.</string>
+    <string name="error_unexpected">Something went wrong. Please try again.</string>
+
+    <!-- Forecast screen -->
+    <string name="detail_title">Forecast</string>
+    <string name="detail_empty">No forecast found for this city.</string>
+    <string name="action_back">Back</string>
+    <string name="detail_clothing">What to wear?</string>
+    <string name="detail_hourly">Hourly</string>
+    <string name="detail_hourly_empty">No forecast falls in this range in the next 24 hours.</string>
+    <string name="detail_daily">7-Day</string>
+    <string name="detail_feels_like">Feels like</string>
+    <string name="detail_humidity">Humidity</string>
+    <string name="detail_wind">Wind</string>
+    <string name="detail_high_low">High %1$s · Low %2$s</string>
+    <string name="now">Now</string>
+    <string name="today">Today</string>
+    <string name="tomorrow">Tomorrow</string>
+    <string name="percent">%1$d%%</string>
+    <string name="wind_speed">%1$d km/h</string>
+
+    <!-- Sun and UV card -->
+    <string name="detail_sun">Sun &amp; UV</string>
+    <string name="sunrise">Sunrise</string>
+    <string name="sunset">Sunset</string>
+    <string name="day_length">Daylight: %1$d h %2$d min</string>
+    <string name="uv_index">UV index</string>
+    <string name="uv_today_max">Today\'s max %1$s</string>
+    <string name="uv_low">Low</string>
+    <string name="uv_moderate">Moderate</string>
+    <string name="uv_high">High</string>
+    <string name="uv_very_high">Very high</string>
+    <string name="uv_extreme">Extreme</string>
+
+    <!-- Hour range filter -->
+    <string name="hour_range_all">All</string>
+    <string name="hour_range_morning">Morning</string>
+    <string name="hour_range_noon">Afternoon</string>
+    <string name="hour_range_evening">Evening</string>
+    <string name="hour_range_night">Night</string>
+
+    <!-- Weather conditions (WMO codes) -->
+    <string name="condition_clear">Clear</string>
+    <string name="condition_mainly_clear">Mainly clear</string>
+    <string name="condition_partly_cloudy">Partly cloudy</string>
+    <string name="condition_overcast">Overcast</string>
+    <string name="condition_fog">Foggy</string>
+    <string name="condition_drizzle">Drizzle</string>
+    <string name="condition_rain">Rain</string>
+    <string name="condition_snow">Snow</string>
+    <string name="condition_rain_showers">Rain showers</string>
+    <string name="condition_snow_showers">Snow showers</string>
+    <string name="condition_thunderstorm">Thunderstorm</string>
+    <string name="condition_unknown">Unknown</string>
+
+    <!-- What to wear: summary by temperature -->
+    <string name="clothing_freezing">Freezing cold; bundle up.</string>
+    <string name="clothing_cold">It\'s cold; a coat and scarf will help.</string>
+    <string name="clothing_cool">A cool day; bring a light jacket.</string>
+    <string name="clothing_mild">Mild weather; long sleeves are enough.</string>
+    <string name="clothing_warm">A warm day; a T-shirt is enough.</string>
+    <string name="clothing_hot">Very hot; wear thin, light-coloured clothes.</string>
+
+    <!-- What to wear: tiles -->
+    <string name="item_heavy_coat">Heavy coat</string>
+    <string name="item_coat">Coat</string>
+    <string name="item_jacket">Light jacket</string>
+    <string name="item_sweater">Sweater</string>
+    <string name="item_long_sleeve">Long sleeves</string>
+    <string name="item_t_shirt">T-shirt</string>
+    <string name="item_light_top">Thin, light top</string>
+    <string name="item_trousers">Trousers</string>
+    <string name="item_shorts">Shorts</string>
+    <string name="item_scarf">Scarf</string>
+    <string name="item_gloves">Gloves</string>
+    <string name="item_beanie">Beanie</string>
+    <string name="item_boots">Waterproof boots</string>
+    <string name="item_umbrella">Umbrella</string>
+    <string name="item_windbreaker">Windbreaker</string>
+    <string name="item_sunglasses">Sunglasses</string>
+    <string name="item_sunscreen">Sunscreen</string>
+    <string name="item_water">Water bottle</string>
+    <string name="item_layers">Layers</string>
+
+    <!-- What to wear: tips -->
+    <string name="tip_raining_now">It\'s raining now; take your umbrella.</string>
+    <string name="tip_rain_at">Rain expected around %1$s; take your umbrella.</string>
+    <string name="tip_rain_likely">%1$d%% chance of rain today; bring an umbrella.</string>
+    <string name="tip_rain_maybe">%1$d%% chance of rain; keep a small umbrella in your bag.</string>
+    <string name="tip_thunderstorm">Thunderstorms around; don\'t stay out in the open for long.</string>
+    <string name="tip_snow">It\'s snowing; wear non-slip, waterproof shoes.</string>
+    <string name="tip_windy">Wind at %1$d km/h; bring something windproof.</string>
+    <string name="tip_uv">UV index reaches %1$d today; wear sunscreen and avoid the midday sun.</string>
+    <string name="tip_sunny">Strong sun; wear sunglasses and sunscreen.</string>
+    <string name="tip_layers">Temperature changes by %1$d° today; wear layers you can take off.</string>
+    <string name="tip_freezing">Don\'t forget gloves and a beanie; exposed skin gets cold fast.</string>
+    <string name="tip_hot">Carry water and stay in the shade at midday.</string>
+</resources>

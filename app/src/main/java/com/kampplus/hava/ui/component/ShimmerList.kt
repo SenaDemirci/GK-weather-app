@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -45,13 +46,16 @@ fun ShimmerList(modifier: Modifier = Modifier, itemCount: Int = 6) {
         modifier = modifier
             .fillMaxSize()
             .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         // Gerçek kartlarla aynı ölçülerde boş kartlar çizilir.
         repeat(itemCount) {
-            Card(modifier = Modifier.fillMaxWidth()) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
+            ) {
                 Row(
-                    modifier = Modifier.padding(12.dp),
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Box(
@@ -60,7 +64,7 @@ fun ShimmerList(modifier: Modifier = Modifier, itemCount: Int = 6) {
                             .background(brush, RoundedCornerShape(12.dp))
                     )
                     Column(
-                        modifier = Modifier.padding(start = 12.dp),
+                        modifier = Modifier.padding(start = 16.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Box(

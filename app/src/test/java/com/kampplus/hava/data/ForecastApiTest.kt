@@ -50,6 +50,22 @@ class ForecastApiTest {
         assertEquals(13.1, checkNotNull(current.apparentTemperatureC), 0.01)
         assertEquals(48, current.humidityPercent)
         assertEquals(9.7, checkNotNull(current.windSpeedKmh), 0.01)
+        assertEquals(3.45, checkNotNull(current.uvIndex), 0.01)
+    }
+
+    @Test
+    fun `gun dogumu batimi ve uv gunluk satirlara eslenir`() = runTest {
+        server.enqueue(MockResponse().setBody(readResource("forecast_single.json")))
+
+        val daily = fetchForecast().daily
+
+        assertEquals(LocalDateTime.parse("2026-09-24T06:51"), daily[0].sunrise)
+        assertEquals(LocalDateTime.parse("2026-09-24T18:58"), daily[0].sunset)
+        assertEquals(5.6, checkNotNull(daily[0].uvIndexMax), 0.01)
+        // Eksik değerler (null) satırı düşürmez; yalnızca o alan boş kalır.
+        assertEquals(null, daily[1].sunrise)
+        assertEquals(LocalDateTime.parse("2026-09-25T18:56"), daily[1].sunset)
+        assertEquals(null, daily[1].uvIndexMax)
     }
 
     @Test

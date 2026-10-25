@@ -13,6 +13,8 @@ import com.kampplus.hava.model.City
 import com.kampplus.hava.ui.city.CityRoute
 import com.kampplus.hava.ui.forecast.ForecastRoute
 import com.kampplus.hava.ui.forecast.ForecastViewModel
+import com.kampplus.hava.ui.locale.AppLanguage
+import com.kampplus.hava.ui.theme.ThemeMode
 
 /**
  * Uygulamanın iki ekranı ve aralarındaki geçiş.
@@ -26,7 +28,14 @@ import com.kampplus.hava.ui.forecast.ForecastViewModel
  * parçası rotayı eşleşmez hâle getirir.
  */
 @Composable
-fun HavaNavHost(modifier: Modifier = Modifier, navController: NavHostController = rememberNavController()) {
+fun HavaNavHost(
+    themeMode: ThemeMode,
+    onThemeModeChange: (ThemeMode) -> Unit,
+    language: AppLanguage,
+    onLanguageChange: (AppLanguage) -> Unit,
+    modifier: Modifier = Modifier,
+    navController: NavHostController = rememberNavController()
+) {
     NavHost(
         navController = navController,
         startDestination = CITY_ROUTE,
@@ -34,7 +43,11 @@ fun HavaNavHost(modifier: Modifier = Modifier, navController: NavHostController 
     ) {
         composable(CITY_ROUTE) {
             CityRoute(
-                onCityClick = { city -> navController.navigate(forecastRoute(city)) }
+                onCityClick = { city -> navController.navigate(forecastRoute(city)) },
+                themeMode = themeMode,
+                onThemeModeChange = onThemeModeChange,
+                language = language,
+                onLanguageChange = onLanguageChange
             )
         }
         composable(

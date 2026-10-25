@@ -1,6 +1,7 @@
 package com.kampplus.hava.ui.forecast
 
 import androidx.lifecycle.SavedStateHandle
+import com.kampplus.hava.R
 import com.kampplus.hava.testing.FakeWeatherRepository
 import com.kampplus.hava.testing.MainDispatcherRule
 import com.kampplus.hava.ui.LoadState
@@ -77,8 +78,8 @@ class ForecastViewModelTest {
         advanceUntilIdle()
 
         assertEquals(
-            "İnternet bağlantını kontrol et.",
-            (viewModel.uiState.value as LoadState.Error).message
+            R.string.error_connection,
+            (viewModel.uiState.value as LoadState.Error).messageRes
         )
     }
 

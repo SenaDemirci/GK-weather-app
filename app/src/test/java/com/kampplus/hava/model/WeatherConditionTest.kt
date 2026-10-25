@@ -41,7 +41,7 @@ class WeatherConditionTest {
         // Boş bir etiket ekranda boşluk olarak görünürdü; hepsinin dolu olduğunu garanti ediyoruz.
         WeatherCondition.entries.forEach { condition ->
             assert(condition.emoji.isNotBlank()) { "${condition.name} için emoji boş" }
-            assert(condition.label.isNotBlank()) { "${condition.name} için etiket boş" }
+            assert(condition.labelRes != 0) { "${condition.name} için etiket yok" }
         }
     }
 }

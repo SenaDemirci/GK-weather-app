@@ -5,6 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.JsonSyntaxException
+import com.kampplus.hava.R
 import com.kampplus.hava.data.OpenMeteoWeatherRepository
 import com.kampplus.hava.data.WeatherRepository
 import com.kampplus.hava.model.Forecast
@@ -61,17 +62,17 @@ class ForecastViewModel(
                 LoadState.Success(repository.getForecast(latitude, longitude))
             } catch (e: IOException) {
                 Log.e(TAG, "Tahmin alınamadı: bağlantı hatası", e)
-                LoadState.Error("İnternet bağlantını kontrol et.")
+                LoadState.Error(R.string.error_connection)
             } catch (e: HttpException) {
                 Log.e(TAG, "Tahmin alınamadı: HTTP ${e.code()}", e)
-                LoadState.Error("Sunucu şu an cevap vermiyor.")
+                LoadState.Error(R.string.error_server)
             } catch (e: JsonSyntaxException) {
                 Log.e(TAG, "Tahmin alınamadı: yanıt çözümlenemedi", e)
-                LoadState.Error("Bir şeyler ters gitti. Tekrar dene.")
+                LoadState.Error(R.string.error_unexpected)
             } catch (e: IllegalStateException) {
                 // ForecastResponse.toForecast(), "current" bloğu yoksa bunu fırlatır.
                 Log.e(TAG, "Tahmin alınamadı: eksik veri", e)
-                LoadState.Error("Bir şeyler ters gitti. Tekrar dene.")
+                LoadState.Error(R.string.error_unexpected)
             }
         }
     }

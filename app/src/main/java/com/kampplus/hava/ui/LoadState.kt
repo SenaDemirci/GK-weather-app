@@ -1,5 +1,7 @@
 package com.kampplus.hava.ui
 
+import androidx.annotation.StringRes
+
 /**
  * Bir ağ isteğinin bitebileceği dört durum.
  *
@@ -23,6 +25,9 @@ sealed interface LoadState<out T> {
 
     data object Empty : LoadState<Nothing>
 
-    /** [message] kullanıcıya gösterilecek, insan dilinde yazılmış metindir. */
-    data class Error(val message: String) : LoadState<Nothing>
+    /**
+     * [messageRes] kullanıcıya gösterilecek, insan dilinde yazılmış metnin kimliğidir.
+     * Metnin kendisi değil kimliği taşınır; ekran onu o anki dilde okur.
+     */
+    data class Error(@StringRes val messageRes: Int) : LoadState<Nothing>
 }

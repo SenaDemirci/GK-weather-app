@@ -43,7 +43,9 @@ data class CurrentResponse(
     @SerializedName("relative_humidity_2m")
     val relativeHumidity: Int? = null,
     @SerializedName("wind_speed_10m")
-    val windSpeed: Double? = null
+    val windSpeed: Double? = null,
+    @SerializedName("uv_index")
+    val uvIndex: Double? = null
 )
 
 data class HourlyResponse(
@@ -65,7 +67,11 @@ data class DailyResponse(
     @SerializedName("temperature_2m_min")
     val temperatureMin: List<Double?>? = null,
     @SerializedName("precipitation_probability_max")
-    val precipitationProbabilityMax: List<Int?>? = null
+    val precipitationProbabilityMax: List<Int?>? = null,
+    val sunrise: List<String?>? = null,
+    val sunset: List<String?>? = null,
+    @SerializedName("uv_index_max")
+    val uvIndexMax: List<Double?>? = null
 )
 
 /**
@@ -91,7 +97,8 @@ private fun CurrentResponse.toCurrentWeather() = CurrentWeather(
     observedAt = LocalDateTime.parse(time),
     apparentTemperatureC = apparentTemperature,
     humidityPercent = relativeHumidity,
-    windSpeedKmh = windSpeed
+    windSpeedKmh = windSpeed,
+    uvIndex = uvIndex
 )
 
 /**
@@ -127,7 +134,11 @@ private fun DailyResponse?.toDailyForecasts(): List<DailyForecast> {
             minTemperatureC = min,
             maxTemperatureC = max,
             weatherCode = code,
-            precipitationProbability = precipitationProbabilityMax?.getOrNull(index)
+            precipitationProbability = precipitationProbabilityMax?.getOrNull(index),
+            // Kutup bölgelerinde güneş hiç doğmayabilir; servis null gönderir, biz de null bırakırız.
+            sunrise = sunrise?.getOrNull(index)?.let(LocalDateTime::parse),
+            sunset = sunset?.getOrNull(index)?.let(LocalDateTime::parse),
+            uvIndexMax = uvIndexMax?.getOrNull(index)
         )
     }
 }

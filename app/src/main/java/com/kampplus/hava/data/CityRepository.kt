@@ -1,6 +1,7 @@
 package com.kampplus.hava.data
 
 import com.kampplus.hava.model.City
+import java.util.Locale
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -33,7 +34,8 @@ class OpenMeteoCityRepository(
     override suspend fun search(query: String): List<City> = withContext(ioDispatcher) {
         // `suspend` tek başına thread değiştirmez. İşi arka plana almak
         // için withContext ile IO dispatcher'ına geçiyoruz.
-        val response = api.search(query.trim())
+        // Şehir ve ülke adları uygulamanın dilinde gelsin: "Almanya" / "Germany".
+        val response = api.search(query.trim(), language = Locale.getDefault().language)
         // Sonuç bulunamazsa servis "results" alanını hiç göndermez; orEmpty() bunu
         // boş listeye çevirir ve ViewModel bunu "Empty" durumu olarak yorumlar.
         response.results.orEmpty()

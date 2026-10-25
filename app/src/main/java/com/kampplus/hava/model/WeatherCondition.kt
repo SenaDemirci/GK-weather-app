@@ -1,25 +1,29 @@
 package com.kampplus.hava.model
 
+import androidx.annotation.StringRes
+import com.kampplus.hava.R
+
 /**
- * Hava durumunun ekrandaki karşılığı: bir emoji ve Türkçe bir etiket.
+ * Hava durumunun ekrandaki karşılığı: bir emoji ve bir etiket. Etiket bir `R.string`
+ * kimliğidir; ekranda o anki dile göre ("Yağmurlu" / "Rain") yazılır.
  *
  * Open-Meteo, sıcaklığın yanında bir de `weather_code` gönderir. Bu kod WMO 4677
  * standardındadır ve tek başına bir sayıdır (0, 61, 95...). Kullanıcıya sayı
  * gösteremeyiz; [fromWeatherCode] ile anlaşılır bir görünüme çeviririz.
  */
-enum class WeatherCondition(val emoji: String, val label: String) {
-    CLEAR("☀️", "Açık"),
-    MAINLY_CLEAR("🌤️", "Az bulutlu"),
-    PARTLY_CLOUDY("⛅", "Parçalı bulutlu"),
-    OVERCAST("☁️", "Kapalı"),
-    FOG("🌫️", "Sisli"),
-    DRIZZLE("🌦️", "Çisenti"),
-    RAIN("🌧️", "Yağmurlu"),
-    SNOW("🌨️", "Karlı"),
-    RAIN_SHOWERS("🌦️", "Sağanak yağış"),
-    SNOW_SHOWERS("🌨️", "Kar sağanağı"),
-    THUNDERSTORM("⛈️", "Gök gürültülü fırtına"),
-    UNKNOWN("🌡️", "Bilinmiyor");
+enum class WeatherCondition(val emoji: String, @StringRes val labelRes: Int) {
+    CLEAR("☀️", R.string.condition_clear),
+    MAINLY_CLEAR("🌤️", R.string.condition_mainly_clear),
+    PARTLY_CLOUDY("⛅", R.string.condition_partly_cloudy),
+    OVERCAST("☁️", R.string.condition_overcast),
+    FOG("🌫️", R.string.condition_fog),
+    DRIZZLE("🌦️", R.string.condition_drizzle),
+    RAIN("🌧️", R.string.condition_rain),
+    SNOW("🌨️", R.string.condition_snow),
+    RAIN_SHOWERS("🌦️", R.string.condition_rain_showers),
+    SNOW_SHOWERS("🌨️", R.string.condition_snow_showers),
+    THUNDERSTORM("⛈️", R.string.condition_thunderstorm),
+    UNKNOWN("🌡️", R.string.condition_unknown);
 
     companion object {
         /**

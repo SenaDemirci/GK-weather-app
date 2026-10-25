@@ -4,11 +4,13 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.JsonSyntaxException
+import com.kampplus.hava.R
 import com.kampplus.hava.data.CityRepository
 import com.kampplus.hava.data.OpenMeteoCityRepository
 import com.kampplus.hava.model.City
 import com.kampplus.hava.ui.LoadState
 import java.io.IOException
+import java.util.Locale
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -42,9 +44,22 @@ class CityViewModel(
     private val _uiState = MutableStateFlow<LoadState<List<City>>>(LoadState.Loading)
     val uiState: StateFlow<LoadState<List<City>>> = _uiState.asStateFlow()
 
+    /** Son aramanın yapıldığı dil; şehir adları bu dilde geldi. */
+    private var searchedLanguage: String? = null
+
     init {
         // Ekran boş açılmasın diye açılışta bir arama yapılır.
         search()
+    }
+
+    /**
+     * Dil değiştiyse aynı aramayı yeniden yapar.
+     *
+     * Dil değişince Activity yeniden kurulur ama ViewModel yaşamaya devam eder; elindeki
+     * sonuçlar eski dildedir ("Almanya"). Yeni dilde ("Germany") gelsin diye tekrar ararız.
+     */
+    fun refreshIfLanguageChanged() {
+        if (searchedLanguage != null && searchedLanguage != Locale.getDefault().language) search()
     }
 
     /** Kullanıcı arama kutusuna her harf yazdığında çağrılır. */
@@ -59,6 +74,7 @@ class CityViewModel(
      * işi otomatik iptal eder, yarıda kalan istek sızıntı yapmaz.
      */
     fun search() {
+        searchedLanguage = Locale.getDefault().language
         viewModelScope.launch {
             _uiState.value = LoadState.Loading
             _uiState.value = try {
@@ -68,15 +84,15 @@ class CityViewModel(
             } catch (e: IOException) {
                 // İnternet yok, DNS çözülemedi veya zaman aşımı.
                 Log.e(TAG, "Arama başarısız: bağlantı hatası", e)
-                LoadState.Error("İnternet bağlantını kontrol et.")
+                LoadState.Error(R.string.error_connection)
             } catch (e: HttpException) {
                 // Sunucu yanıt verdi ama 4xx/5xx döndü.
                 Log.e(TAG, "Arama başarısız: HTTP ${e.code()}", e)
-                LoadState.Error("Sunucu şu an cevap vermiyor.")
+                LoadState.Error(R.string.error_server)
             } catch (e: JsonSyntaxException) {
                 // Beklenmeyen JSON: model ile yanıt uyuşmuyor.
                 Log.e(TAG, "Arama başarısız: yanıt çözümlenemedi", e)
-                LoadState.Error("Bir şeyler ters gitti. Tekrar dene.")
+                LoadState.Error(R.string.error_unexpected)
             }
             // Kullanıcıya sade mesaj, Logcat'e teknik ayrıntı.
         }

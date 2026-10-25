@@ -37,10 +37,11 @@ interface ForecastApi {
 
     companion object {
         const val CURRENT_FIELDS =
-            "temperature_2m,weather_code,apparent_temperature,relative_humidity_2m,wind_speed_10m"
+            "temperature_2m,weather_code,apparent_temperature,relative_humidity_2m,wind_speed_10m,uv_index"
         const val HOURLY_FIELDS = "temperature_2m,weather_code,precipitation_probability"
         const val DAILY_FIELDS =
-            "weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max"
+            "weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max," +
+                "sunrise,sunset,uv_index_max"
         const val FORECAST_DAYS = 7
     }
 }

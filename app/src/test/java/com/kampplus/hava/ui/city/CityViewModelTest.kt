@@ -1,5 +1,6 @@
 package com.kampplus.hava.ui.city
 
+import com.kampplus.hava.R
 import com.kampplus.hava.testing.FakeCityRepository
 import com.kampplus.hava.testing.MainDispatcherRule
 import com.kampplus.hava.testing.sampleCity
@@ -85,7 +86,8 @@ class CityViewModelTest {
         val state = viewModel.uiState.value
         assertTrue("Error bekleniyordu, gelen: $state", state is LoadState.Error)
         // Kullanıcıya teknik mesaj değil, insan dilinde bir cümle gösterilir.
-        assertEquals("İnternet bağlantını kontrol et.", (state as LoadState.Error).message)
+        // Metin değil metnin kimliği taşınır; ekran onu o anki dilde gösterir.
+        assertEquals(R.string.error_connection, (state as LoadState.Error).messageRes)
     }
 
     @Test
@@ -98,8 +100,8 @@ class CityViewModelTest {
         advanceUntilIdle()
 
         assertEquals(
-            "Sunucu şu an cevap vermiyor.",
-            (viewModel.uiState.value as LoadState.Error).message
+            R.string.error_server,
+            (viewModel.uiState.value as LoadState.Error).messageRes
         )
     }
 
