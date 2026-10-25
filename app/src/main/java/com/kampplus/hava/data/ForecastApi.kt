@@ -35,6 +35,22 @@ interface ForecastApi {
         @Query("timezone") timezone: String = "auto"
     ): ForecastResponse
 
+    /**
+     * Birden çok nokta için bugünün ortalama sıcaklığı, tek istekte.
+     *
+     * Koordinatlar virgülle ayrılarak gönderilir (`latitude=41.01,39.92,...`); servis her
+     * nokta için ayrı bir nesne içeren bir **liste** döndürür, gönderilen sırayla.
+     * Türkiye haritası 81 ilin sıcaklığını böyle alır.
+     */
+    @GET("v1/forecast")
+    suspend fun getDailyMeans(
+        @Query("latitude") latitudes: String,
+        @Query("longitude") longitudes: String,
+        @Query("daily") daily: String = "temperature_2m_mean,weather_code",
+        @Query("forecast_days") forecastDays: Int = 1,
+        @Query("timezone") timezone: String = "auto"
+    ): List<DailyMeanResponse>
+
     companion object {
         const val CURRENT_FIELDS =
             "temperature_2m,weather_code,apparent_temperature,relative_humidity_2m,wind_speed_10m,uv_index"

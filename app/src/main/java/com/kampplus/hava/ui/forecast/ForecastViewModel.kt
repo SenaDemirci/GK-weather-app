@@ -6,9 +6,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.JsonSyntaxException
 import com.kampplus.hava.R
+import com.kampplus.hava.data.OpenMeteoPollenRepository
 import com.kampplus.hava.data.OpenMeteoWeatherRepository
+import com.kampplus.hava.data.PollenRepository
 import com.kampplus.hava.data.WeatherRepository
 import com.kampplus.hava.model.Forecast
+import com.kampplus.hava.model.PollenForecast
 import com.kampplus.hava.ui.LoadState
 import java.io.IOException
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,7 +29,8 @@ import retrofit2.HttpException
  */
 class ForecastViewModel(
     savedStateHandle: SavedStateHandle,
-    private val repository: WeatherRepository
+    private val repository: WeatherRepository,
+    private val pollenRepository: PollenRepository
 ) : ViewModel() {
 
     /**
@@ -34,7 +38,7 @@ class ForecastViewModel(
      * kurucu arar. Varsayılan parametre kullanmak bu imzayı üretmediği için ikincil
      * kurucuyu elle yazıyoruz.
      */
-    constructor(savedStateHandle: SavedStateHandle) : this(savedStateHandle, OpenMeteoWeatherRepository())
+    constructor(savedStateHandle: SavedStateHandle) : this(savedStateHandle, OpenMeteoWeatherRepository(), OpenMeteoPollenRepository())
 
     /** Başlıkta gösterilecek şehir adı; rotadan gelir. */
     val cityName: String = savedStateHandle.get<String>(ARG_NAME).orEmpty()
@@ -48,6 +52,15 @@ class ForecastViewModel(
     private val _uiState = MutableStateFlow<LoadState<Forecast>>(LoadState.Loading)
     val uiState: StateFlow<LoadState<Forecast>> = _uiState.asStateFlow()
 
+    /**
+     * Polen tahmini; yoksa ya da alınamadıysa null.
+     *
+     * Tahminden ayrı tutulur ve ayrı yüklenir: polen servisi hata verse ya da bölge
+     * kapsam dışında olsa bile hava tahmini ekranda görünmeye devam eder.
+     */
+    private val _pollen = MutableStateFlow<LoadState<PollenForecast>>(LoadState.Loading)
+    val pollen: StateFlow<LoadState<PollenForecast>> = _pollen.asStateFlow()
+
     init {
         load()
     }
@@ -56,6 +69,7 @@ class ForecastViewModel(
     fun onRetry() = load()
 
     private fun load() {
+        loadPollen()
         viewModelScope.launch {
             _uiState.value = LoadState.Loading
             _uiState.value = try {
@@ -72,6 +86,25 @@ class ForecastViewModel(
             } catch (e: IllegalStateException) {
                 // ForecastResponse.toForecast(), "current" bloğu yoksa bunu fırlatır.
                 Log.e(TAG, "Tahmin alınamadı: eksik veri", e)
+                LoadState.Error(R.string.error_unexpected)
+            }
+        }
+    }
+
+    /** Polen verisini getirir. Kapsam dışı bölge "Empty", ağ hatası "Error" olur. */
+    private fun loadPollen() {
+        viewModelScope.launch {
+            _pollen.value = LoadState.Loading
+            _pollen.value = try {
+                pollenRepository.getPollen(latitude, longitude)?.let { LoadState.Success(it) } ?: LoadState.Empty
+            } catch (e: IOException) {
+                Log.w(TAG, "Polen alınamadı: bağlantı hatası", e)
+                LoadState.Error(R.string.error_connection)
+            } catch (e: HttpException) {
+                Log.w(TAG, "Polen alınamadı: HTTP ${e.code()}", e)
+                LoadState.Error(R.string.error_server)
+            } catch (e: JsonSyntaxException) {
+                Log.w(TAG, "Polen alınamadı: yanıt çözümlenemedi", e)
                 LoadState.Error(R.string.error_unexpected)
             }
         }

@@ -2,6 +2,7 @@ package com.kampplus.hava.ui.forecast
 
 import androidx.lifecycle.SavedStateHandle
 import com.kampplus.hava.R
+import com.kampplus.hava.testing.FakePollenRepository
 import com.kampplus.hava.testing.FakeWeatherRepository
 import com.kampplus.hava.testing.MainDispatcherRule
 import com.kampplus.hava.ui.LoadState
@@ -27,6 +28,7 @@ class ForecastViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private val repository = FakeWeatherRepository()
+    private val pollenRepository = FakePollenRepository()
 
     private fun createViewModel(
         name: String = "Ankara",
@@ -42,7 +44,8 @@ class ForecastViewModelTest {
                 ForecastViewModel.ARG_LONGITUDE to longitude
             )
         ),
-        repository = repository
+        repository = repository,
+        pollenRepository = pollenRepository
     )
 
     @Test
@@ -115,6 +118,26 @@ class ForecastViewModelTest {
         advanceUntilIdle()
 
         // toDoubleOrNull() null dönünce 0.0 kullanılır; istek yine de yapılır.
+        assertTrue(viewModel.uiState.value is LoadState.Success)
+    }
+
+    @Test
+    fun `polen kapsam disindaysa Empty olur ve tahmini etkilemez`() = runTest {
+        pollenRepository.result = null
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        assertEquals(LoadState.Empty, viewModel.pollen.value)
+        assertTrue(viewModel.uiState.value is LoadState.Success)
+    }
+
+    @Test
+    fun `polen hatasi tahmini bozmaz`() = runTest {
+        pollenRepository.error = IOException("no network")
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        assertEquals(LoadState.Error(R.string.error_connection), viewModel.pollen.value)
         assertTrue(viewModel.uiState.value is LoadState.Success)
     }
 }

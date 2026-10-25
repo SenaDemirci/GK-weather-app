@@ -1,5 +1,6 @@
 package com.kampplus.hava.ui.city
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kampplus.hava.model.City
 import com.kampplus.hava.ui.theme.HavaTheme
+import com.kampplus.hava.ui.theme.raisedCard
 
 /**
  * Listedeki tek bir şehir satırı.
@@ -41,7 +43,10 @@ fun CityCard(city: City, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Card(
         onClick = onClick,
         modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
+        // Beyaz kart, ince çerçeve ve gölge: açık mavi zeminden belirgin biçimde ayrılır.
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.raisedCard),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp, pressedElevation = 1.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),

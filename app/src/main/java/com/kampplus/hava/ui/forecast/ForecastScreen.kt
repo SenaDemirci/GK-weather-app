@@ -71,15 +71,22 @@ import com.kampplus.hava.model.DailyForecast
 import com.kampplus.hava.model.Forecast
 import com.kampplus.hava.model.HourRange
 import com.kampplus.hava.model.HourlyForecast
+import com.kampplus.hava.model.PollenForecast
 import com.kampplus.hava.model.UvLevel
 import com.kampplus.hava.model.WeatherCondition
 import com.kampplus.hava.ui.LoadState
+import com.kampplus.hava.ui.assistant.AssistantCity
+import com.kampplus.hava.ui.assistant.AssistantSheet
+import com.kampplus.hava.ui.assistant.AssistantViewModel
+import com.kampplus.hava.ui.assistant.CitySuggestions
+import com.kampplus.hava.ui.assistant.RobotMascot
 import com.kampplus.hava.ui.component.ErrorView
 import com.kampplus.hava.ui.theme.HavaTheme
 import com.kampplus.hava.ui.theme.MaxContentWidth
 import com.kampplus.hava.ui.theme.OnSky
 import com.kampplus.hava.ui.theme.UvScaleColors
 import com.kampplus.hava.ui.theme.color
+import com.kampplus.hava.ui.theme.raisedCard
 import com.kampplus.hava.ui.theme.skyBrush
 import java.time.Duration
 import java.time.LocalDate
@@ -95,11 +102,13 @@ import kotlin.math.roundToInt
 @Composable
 fun ForecastRoute(onBack: () -> Unit, modifier: Modifier = Modifier, viewModel: ForecastViewModel = viewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val pollen by viewModel.pollen.collectAsStateWithLifecycle()
 
     ForecastScreen(
         cityName = viewModel.cityName,
         subtitle = viewModel.subtitle,
         uiState = uiState,
+        pollen = pollen,
         onBack = onBack,
         onRetry = viewModel::onRetry,
         modifier = modifier
@@ -120,10 +129,23 @@ fun ForecastScreen(
     uiState: LoadState<Forecast>,
     onBack: () -> Unit,
     onRetry: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    pollen: LoadState<PollenForecast> = LoadState.Empty
 ) {
+    // Robot paneli açık mı; ekran dönünce korunur. Sohbetin kendisi ViewModel'de yaşar.
+    var assistantOpen by rememberSaveable { mutableStateOf(false) }
     Scaffold(
         modifier = modifier,
+        // Robot yalnızca tahmin geldiğinde görünür; boş tahminle konuşacak bir şey yok.
+        floatingActionButton = {
+            if (uiState is LoadState.Success) {
+                RobotMascot(
+                    message = stringResource(R.string.bot_hello_forecast),
+                    onClick = { assistantOpen = true },
+                    contentDescription = stringResource(R.string.bot_open)
+                )
+            }
+        },
         topBar = {
             TopAppBar(
                 title = { Text(cityName.ifEmpty { stringResource(R.string.detail_title) }) },
@@ -150,20 +172,33 @@ fun ForecastScreen(
                 LoadState.Loading -> CircularProgressIndicator()
                 LoadState.Empty -> ErrorView(message = stringResource(R.string.detail_empty))
                 is LoadState.Error -> ErrorView(message = stringResource(uiState.messageRes), onRetry = onRetry)
-                is LoadState.Success -> ForecastContent(subtitle = subtitle, forecast = uiState.data)
+                is LoadState.Success -> ForecastContent(subtitle = subtitle, forecast = uiState.data, pollen = pollen)
             }
         }
+    }
+    if (assistantOpen && uiState is LoadState.Success) {
+        // Sohbet bu şehrin tahminiyle başlar; kullanıcı başka bir şehir yazarsa ona geçer.
+        val assistant = viewModel(key = "assistant-forecast") {
+            AssistantViewModel(initialCity = AssistantCity(cityName, subtitle, uiState.data))
+        }
+        AssistantSheet(
+            viewModel = assistant,
+            cityName = cityName,
+            suggestions = CitySuggestions,
+            onDismiss = { assistantOpen = false }
+        )
     }
 }
 
 @Composable
-private fun ForecastContent(subtitle: String, forecast: Forecast, modifier: Modifier = Modifier) {
+private fun ForecastContent(subtitle: String, forecast: Forecast, pollen: LoadState<PollenForecast>, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
             .fillMaxSize()
             // İçerik ekrana sığmayabilir; dikey kaydırma ekliyoruz.
             .verticalScroll(rememberScrollState())
-            .padding(top = 8.dp, bottom = 24.dp),
+            // Alttaki boşluk, robot düğmesi son kartın üstünü kapatmasın diye.
+            .padding(top = 8.dp, bottom = 96.dp),
         // Tablette içerik ortada, en fazla [MaxContentWidth] genişliğinde durur.
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -198,6 +233,8 @@ private fun ForecastContent(subtitle: String, forecast: Forecast, modifier: Modi
                 modifier = contentModifier.padding(horizontal = 16.dp)
             )
         }
+        SectionTitle(stringResource(R.string.detail_pollen), contentModifier)
+        PollenCard(pollen = pollen, modifier = contentModifier.padding(horizontal = 16.dp))
         SectionTitle(stringResource(R.string.detail_hourly), contentModifier)
         // Filtre her zaman aynı 24 saatlik pencereye uygulanır; "Sabah" yarının sabahı da olabilir.
         // `rememberSaveable`: ekran dönünce seçili aralık kaybolmaz.
@@ -244,7 +281,7 @@ private fun CurrentWeatherHeader(subtitle: String, current: CurrentWeather, toda
         today?.let {
             Text(
                 text = stringResource(R.string.detail_high_low, degrees(it.maxTemperatureC), degrees(it.minTemperatureC)),
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.titleMedium,
                 color = OnSky.copy(alpha = 0.85f)
             )
         }
@@ -292,7 +329,7 @@ private fun ClothingCard(advice: ClothingAdvice, modifier: Modifier = Modifier) 
         )
     ) {
         Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            Text(text = stringResource(advice.summaryRes), style = MaterialTheme.typography.titleMedium)
+            Text(text = stringResource(advice.summaryRes), style = MaterialTheme.typography.titleLarge)
             FlowRow(
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -338,7 +375,7 @@ private fun ClothingTipRow(tip: ClothingTip, modifier: Modifier = Modifier) {
 @Composable
 private fun ClothingTile(item: ClothingItem, modifier: Modifier = Modifier) {
     Surface(
-        modifier = modifier.size(width = 100.dp, height = 132.dp),
+        modifier = modifier.size(width = 124.dp, height = 160.dp),
         shape = MaterialTheme.shapes.medium,
         color = MaterialTheme.colorScheme.surfaceContainerLowest,
         contentColor = MaterialTheme.colorScheme.onSurface,
@@ -352,10 +389,10 @@ private fun ClothingTile(item: ClothingItem, modifier: Modifier = Modifier) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically)
         ) {
-            Text(text = item.emoji, fontSize = 40.sp)
+            Text(text = item.emoji, fontSize = 44.sp)
             Text(
                 text = stringResource(item.labelRes),
-                style = MaterialTheme.typography.labelLarge,
+                style = MaterialTheme.typography.titleMedium,
                 textAlign = TextAlign.Center,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
@@ -377,7 +414,8 @@ private fun ClothingTile(item: ClothingItem, modifier: Modifier = Modifier) {
 private fun SunCard(today: DailyForecast, currentUv: Double?, modifier: Modifier = Modifier) {
     Card(
         modifier = modifier,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.raisedCard),
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
         Row(modifier = Modifier.padding(20.dp), horizontalArrangement = Arrangement.spacedBy(20.dp)) {
             Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -389,7 +427,7 @@ private fun SunCard(today: DailyForecast, currentUv: Double?, modifier: Modifier
                     val daylight = Duration.between(sunrise, sunset)
                     Text(
                         text = stringResource(R.string.day_length, daylight.toHours().toInt(), (daylight.toMinutes() % 60).toInt()),
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -407,8 +445,8 @@ private fun SunTime(emoji: String, label: String, time: LocalDateTime) {
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         Text(text = emoji, fontSize = 28.sp)
         Column {
-            Text(text = label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Text(text = time.format(HOUR_FORMAT), style = MaterialTheme.typography.titleLarge)
+            Text(text = label, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(text = time.format(HOUR_FORMAT), style = MaterialTheme.typography.headlineSmall)
         }
     }
 }
@@ -427,7 +465,7 @@ private fun UvGauge(uv: Double, todayMax: Double?, modifier: Modifier = Modifier
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(
             text = stringResource(R.string.uv_index),
-            style = MaterialTheme.typography.labelMedium,
+            style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -437,7 +475,7 @@ private fun UvGauge(uv: Double, todayMax: Double?, modifier: Modifier = Modifier
                     .size(10.dp)
                     .background(level.color, CircleShape)
             )
-            Text(text = stringResource(level.labelRes), style = MaterialTheme.typography.titleMedium)
+            Text(text = stringResource(level.labelRes), style = MaterialTheme.typography.titleLarge)
         }
         Canvas(
             modifier = Modifier
@@ -461,7 +499,7 @@ private fun UvGauge(uv: Double, todayMax: Double?, modifier: Modifier = Modifier
         todayMax?.let {
             Text(
                 text = stringResource(R.string.uv_today_max, "%.1f".format(LocalConfiguration.current.locales[0], it)),
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
@@ -537,12 +575,12 @@ private fun HourlyRow(hours: List<HourlyForecast>, now: LocalDateTime, modifier:
         items(items = hours, key = { it.time.toString() }) { hour ->
             val isNow = hour.time == now
             Card(
-                modifier = Modifier.width(72.dp),
+                modifier = Modifier.width(84.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = if (isNow) {
                         MaterialTheme.colorScheme.primaryContainer
                     } else {
-                        MaterialTheme.colorScheme.surfaceContainerLow
+                        MaterialTheme.colorScheme.raisedCard
                     }
                 )
             ) {
@@ -557,24 +595,24 @@ private fun HourlyRow(hours: List<HourlyForecast>, now: LocalDateTime, modifier:
                         Text(
                             // Bugünün kartlarında boşluk: kartların yüksekliği eşit kalsın.
                             text = if (hour.time.toLocalDate() != today) stringResource(R.string.tomorrow) else " ",
-                            style = MaterialTheme.typography.labelSmall,
+                            style = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.secondary
                         )
                     }
                     Text(
                         text = if (isNow) stringResource(R.string.now) else hour.time.format(HOUR_FORMAT),
-                        style = MaterialTheme.typography.labelMedium
+                        style = MaterialTheme.typography.titleSmall
                     )
                     Text(
                         text = WeatherCondition.fromWeatherCode(hour.weatherCode).emoji,
                         style = MaterialTheme.typography.headlineSmall
                     )
-                    Text(text = degrees(hour.temperatureC), style = MaterialTheme.typography.titleMedium)
+                    Text(text = degrees(hour.temperatureC), style = MaterialTheme.typography.titleLarge)
                     Text(
                         // Boş string yerine boşluk: kartların yüksekliği eşit kalsın.
                         text = percent(hour.precipitationProbability) ?: " ",
-                        style = MaterialTheme.typography.labelSmall,
+                        style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.primary
                     )
                 }
@@ -595,7 +633,8 @@ private fun DailyCard(days: List<DailyForecast>, modifier: Modifier = Modifier) 
     val weekMax = days.maxOfOrNull { it.maxTemperatureC } ?: 0.0
     Card(
         modifier = modifier,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.raisedCard),
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
         Column(modifier = Modifier.padding(vertical = 8.dp)) {
             days.forEachIndexed { index, day ->
@@ -616,22 +655,22 @@ private fun DailyRow(day: DailyForecast, isToday: Boolean, weekMin: Double, week
     ) {
         Text(
             text = if (isToday) stringResource(R.string.today) else dayName(day.date),
-            style = MaterialTheme.typography.bodyLarge,
+            style = MaterialTheme.typography.titleMedium,
             fontWeight = if (isToday) FontWeight.SemiBold else null,
             maxLines = 1,
-            modifier = Modifier.width(96.dp)
+            modifier = Modifier.width(124.dp)
         )
         Column(modifier = Modifier.width(48.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Text(text = WeatherCondition.fromWeatherCode(day.weatherCode).emoji, style = MaterialTheme.typography.titleLarge)
             percent(day.precipitationProbability)?.let {
-                Text(text = it, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
+                Text(text = it, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
             }
         }
         Text(
             text = degrees(day.minTemperatureC),
-            style = MaterialTheme.typography.bodyLarge,
+            style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.width(40.dp),
+            modifier = Modifier.width(48.dp),
             textAlign = TextAlign.End
         )
         TemperatureBar(
@@ -645,8 +684,8 @@ private fun DailyRow(day: DailyForecast, isToday: Boolean, weekMin: Double, week
         )
         Text(
             text = degrees(day.maxTemperatureC),
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.width(40.dp)
+            style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier.width(52.dp)
         )
     }
 }
@@ -688,9 +727,9 @@ private fun Metric(emoji: String, label: String, value: String, modifier: Modifi
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
-        Text(text = emoji, style = MaterialTheme.typography.titleMedium)
-        Text(text = value, style = MaterialTheme.typography.titleMedium, color = OnSky)
-        Text(text = label, style = MaterialTheme.typography.labelMedium, color = OnSky.copy(alpha = 0.85f))
+        Text(text = emoji, style = MaterialTheme.typography.titleLarge)
+        Text(text = value, style = MaterialTheme.typography.titleLarge, color = OnSky)
+        Text(text = label, style = MaterialTheme.typography.titleSmall, color = OnSky.copy(alpha = 0.85f))
     }
 }
 
@@ -698,7 +737,7 @@ private fun Metric(emoji: String, label: String, value: String, modifier: Modifi
 private fun SectionTitle(text: String, modifier: Modifier = Modifier) {
     Text(
         text = text,
-        style = MaterialTheme.typography.titleMedium,
+        style = MaterialTheme.typography.titleLarge,
         modifier = modifier.padding(start = 20.dp, end = 20.dp, top = 24.dp, bottom = 12.dp)
     )
 }

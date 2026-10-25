@@ -13,7 +13,7 @@
 
     <!-- Şehir listesi ekranı -->
     <string name="city_title">Hava nasıl?</string>
-    <string name="city_header_subtitle">Bir şehir ara; anlık durumu, saatlik ve 7 günlük tahmini gör.</string>
+    <string name="city_header_subtitle">Bir şehir ara; anlık, saatlik ve 7 günlük tahmini gör.</string>
     <string name="greeting_morning">Günaydın</string>
     <string name="greeting_day">İyi günler</string>
     <string name="greeting_evening">İyi akşamlar</string>
@@ -34,6 +34,7 @@
     <string name="theme_light">Açık</string>
     <string name="theme_dark">Koyu</string>
     <string name="language_button">Dil: %1$s</string>
+    <string name="language_auto">Oto</string>
     <string name="language_system">Sistem dili</string>
 
     <!-- Hata mesajları. Kullanıcıya teknik ayrıntı değil, ne yapacağı söylenir. -->
@@ -136,4 +137,96 @@
     <string name="tip_layers">Gün içinde sıcaklık %1$d° değişiyor; katmanlı giy, ısınınca çıkarırsın.</string>
     <string name="tip_freezing">Eldiven ve bereni unutma; açıkta kalan yerler çabuk üşür.</string>
     <string name="tip_hot">Yanına su al, öğle sıcağında gölgede kal.</string>
+
+    <!-- Hava Robotu (kural tabanlı sohbet). %1$s gibi gün yerlerine "bugün", "yarın" ya da gün adı gelir; ekran cümlenin ilk harfini büyütür. -->
+    <string name="bot_hello_city">Sana nasıl yardımcı olabilirim? Mesela havadan sudan konuşabiliriz 🙂</string>
+    <string name="bot_hello_forecast">Bu şehrin havasıyla ilgili her şeyi bana sorabilirsin!</string>
+    <string name="bot_name">Hava Robotu</string>
+    <string name="bot_open">Hava Robotu\'na sor</string>
+    <string name="bot_subtitle">%1$s için sorularını yanıtlar</string>
+    <string name="bot_subtitle_general">Herhangi bir şehrin havasını sorabilirsin</string>
+    <string name="bot_input_hint">Bir soru yaz…</string>
+    <string name="bot_send">Gönder</string>
+    <string name="bot_close">Kapat</string>
+    <string name="day_today_lower">bugün</string>
+    <string name="day_tomorrow_lower">yarın</string>
+    <string name="bot_suggest_rain">Yarın yağmur var mı?</string>
+    <string name="bot_suggest_wear">Bugün ne giymeliyim?</string>
+    <string name="bot_suggest_picnic">Hafta sonu pikniğe uygun mu?</string>
+    <string name="bot_suggest_best">Bu hafta en güzel gün hangisi?</string>
+    <string name="bot_suggest_uv">Bugün UV nasıl?</string>
+    <string name="bot_suggest_sun">Güneş ne zaman batıyor?</string>
+    <string name="bot_greeting">Merhaba! Ben Hava Robotu. %1$s için yağmur, sıcaklık, kıyafet, UV ya da piknik için uygun gün sorabilirsin.</string>
+    <string name="bot_unknown">Bunu henüz anlayamıyorum. Yağmur, sıcaklık, kıyafet, UV, gün doğumu/batımı, rüzgâr ya da dışarı çıkmaya uygun gün hakkında sorabilirsin.</string>
+    <string name="bot_thanks">Rica ederim! Başka bir şey sormak istersen buradayım.</string>
+    <string name="bot_out_of_range">Elimde yalnızca önümüzdeki 7 günün tahmini var.</string>
+    <string name="bot_no_data">Bunun için tahminde veri yok.</string>
+    <string name="bot_rain_now">Şu an yağmur yağıyor; şemsiyeni al.</string>
+    <string name="bot_rain_at">Bugün saat %1$s civarı yağmur bekleniyor (ihtimal %%%2$d); şemsiyeni al.</string>
+    <string name="bot_rain_likely">%1$s yağmur ihtimali %%%2$d; şemsiyeni al.</string>
+    <string name="bot_rain_maybe">%1$s yağmur ihtimali %%%2$d; küçük bir şemsiye çantada dursun.</string>
+    <string name="bot_rain_unlikely">%1$s yağmur beklenmiyor (ihtimal %%%2$d).</string>
+    <string name="bot_temperature_day">%1$s en düşük %2$d°, en yüksek %3$d°.</string>
+    <string name="bot_temperature_now">Şu an %1$d°, hissedilen %2$d°.</string>
+    <string name="bot_clothing_intro">%1$s için önerim:</string>
+    <string name="bot_clothing_items">Yanına al: %1$s.</string>
+    <string name="bot_uv_day">%1$s UV en yüksek %2$d (%3$s).</string>
+    <string name="bot_uv_now">Şu an UV %1$d.</string>
+    <string name="bot_uv_protect">Güneş kremi sür, öğle güneşinden kaçın.</string>
+    <string name="bot_uv_fine">Özel bir önlem gerekmiyor.</string>
+    <string name="bot_sun">%1$s gün doğumu %2$s, gün batımı %3$s.</string>
+    <string name="bot_wind_strong">Şu an rüzgâr %1$d km/sa ile sert esiyor; rüzgâr geçirmeyen bir şey al. (Rüzgâr için yalnızca anlık veri var.)</string>
+    <string name="bot_wind_calm">Şu an rüzgâr %1$d km/sa, sakin. (Rüzgâr için yalnızca anlık veri var.)</string>
+    <string name="bot_outdoor_storm">%1$s fırtına bekleniyor; dışarı plan yapmamanı öneririm.</string>
+    <string name="bot_outdoor_rain">%1$s pek uygun değil: yağmur ihtimali %%%2$d.</string>
+    <string name="bot_outdoor_cold">%1$s biraz soğuk: en yüksek %2$d°. Sıkı giyinirsen olur.</string>
+    <string name="bot_outdoor_hot">%1$s çok sıcak: en yüksek %2$d°. Gölge ve bol su şart.</string>
+    <string name="bot_outdoor_maybe">%1$s fena değil ama yağmur ihtimali %%%2$d; şemsiyeni yanına al.</string>
+    <string name="bot_outdoor_good">%1$s dışarısı için güzel görünüyor: %2$s, %3$d–%4$d°, yağmur ihtimali %%%5$d.</string>
+    <string name="bot_best_day">Önümüzdeki günlerde en güzeli %1$s görünüyor.</string>
+    <string name="bot_summary">%1$s: %2$s, en düşük %3$d°, en yüksek %4$d°, yağmur ihtimali %%%5$d.</string>
+    <string name="bot_greeting_general">Merhaba! Ben Hava Robotu. İstersen biraz havadan sudan konuşalım 🙂 Merak ettiğin şehri yaz; örneğin “İzmir\'de yarın yağmur var mı?”</string>
+    <string name="bot_ask_city">Hangi şehir için bakayım? Mesajına şehir adını ekle; örneğin “Ankara hava nasıl?”</string>
+    <string name="bot_city_not_found">“%1$s” adında bir şehir bulamadım. Yazımı kontrol eder misin?</string>
+    <string name="bot_city_header">📍 %1$s</string>
+    <string name="bot_thinking">Hava Robotu yazıyor…</string>
+    <string name="bot_suggest_city_1">İstanbul hava nasıl?</string>
+    <string name="bot_suggest_city_2">İzmir\'de yarın yağmur var mı?</string>
+    <string name="bot_suggest_city_3">Ankara\'da bugün ne giymeliyim?</string>
+    <string name="bot_suggest_city_4">Antalya hafta sonu pikniğe uygun mu?</string>
+
+    <!-- Polen ve alerji -->
+    <string name="detail_pollen">Polen ve Alerji</string>
+    <string name="pollen_grass">Çimen</string>
+    <string name="pollen_birch">Huş</string>
+    <string name="pollen_alder">Kızılağaç</string>
+    <string name="pollen_olive">Zeytin</string>
+    <string name="pollen_mugwort">Pelin</string>
+    <string name="pollen_ragweed">Ambrosia</string>
+    <string name="pollen_level_none">Yok</string>
+    <string name="pollen_level_low">Düşük</string>
+    <string name="pollen_level_moderate">Orta</string>
+    <string name="pollen_level_high">Yüksek</string>
+    <string name="pollen_level_very_high">Çok yüksek</string>
+    <string name="pollen_alert_high">Bugün polen yoğun: %1$s. Alerjin varsa dışarıda maske tak, pencereleri kapalı tut ve eve gelince yüzünü yıka.</string>
+    <string name="pollen_alert_moderate">Bugün orta seviyede polen var: %1$s. Alerjin varsa ilacını yanında bulundur.</string>
+    <string name="pollen_alert_low">Bugün polen düşük; alerjisi olanlar için rahat bir gün.</string>
+    <string name="pollen_quiet">Havada polen yok denecek kadar az 🌿 Polen tahmini bahar ve yaz aylarında dolar.</string>
+    <string name="pollen_unavailable">Bu bölge için polen verisi yok; polen tahmini yalnızca Avrupa ve Türkiye için var.</string>
+    <string name="pollen_type_header">Tür</string>
+
+    <!-- Türkiye sıcaklık haritası -->
+    <string name="map_title">Türkiye Sıcaklık Haritası</string>
+    <string name="map_open">Türkiye sıcaklık haritası</string>
+    <string name="map_open_subtitle">81 ilin bugünkü ortalama sıcaklığı</string>
+    <string name="map_hint">Bir ile dokun. İki parmakla yakınlaştırabilir, çift dokunarak eski haline döndürebilirsin.</string>
+    <string name="map_select_prompt">Haritadan bir il seç 👆</string>
+    <string name="map_today_mean">Bugün ortalama %1$d°</string>
+    <string name="map_open_forecast">Hava durumu</string>
+    <string name="map_hottest">🔥 En sıcak: %1$s %2$d°</string>
+    <string name="map_coldest">❄️ En soğuk: %1$s %2$d°</string>
+    <string name="map_empty">Şu an sıcaklık verisi alınamadı.</string>
+    <string name="sea_black">Karadeniz</string>
+    <string name="sea_mediterranean">Akdeniz</string>
+    <string name="sea_aegean">Ege</string>
 </resources>

@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kampplus.hava.ui.theme.HavaTheme
+import com.kampplus.hava.ui.theme.raisedCard
 
 /**
  * Yükleniyor durumunun görünümü.
@@ -52,7 +53,8 @@ fun ShimmerList(modifier: Modifier = Modifier, itemCount: Int = 6) {
         repeat(itemCount) {
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.raisedCard),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
                 Row(
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),

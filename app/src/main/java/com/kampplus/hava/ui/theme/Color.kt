@@ -37,10 +37,10 @@ internal val Neutral92 = Color(0xFFECEEF4)
 internal val Neutral95 = Color(0xFFF2F3FA)
 internal val Neutral98 = Color(0xFFF8F9FF)
 internal val Neutral100 = Color(0xFFFFFFFF)
-internal val NeutralVariant30 = Color(0xFF43474E)
+internal val NeutralVariant30 = Color(0xFF363B44)
 internal val NeutralVariant50 = Color(0xFF74777F)
 internal val NeutralVariant60 = Color(0xFF8E9099)
-internal val NeutralVariant80 = Color(0xFFC4C6D0)
+internal val NeutralVariant80 = Color(0xFFD3D6E0)
 internal val NeutralVariant90 = Color(0xFFE0E2EC)
 
 internal val Red10 = Color(0xFF410002)
@@ -70,3 +70,23 @@ internal val UvYellow = Color(0xFFF2C12E)
 internal val UvOrange = Color(0xFFF08C2E)
 internal val UvRed = Color(0xFFE5484D)
 internal val UvPurple = Color(0xFF8E4EC6)
+
+// Tema düğmesinin zeminleri: açık temada gündüz gökyüzü (güneş üstünde parlasın),
+// koyu temada gece laciverti (ay belirgin olsun).
+internal val PillDayTop = Color(0xFF4FC3F7)
+internal val PillDayBottom = Color(0xFF1E6FD9)
+internal val PillNightTop = Color(0xFF3F51B5)
+internal val PillNightBottom = Color(0xFF141B4D)
+
+// Polen "Yok" seviyesi: nötr gri; renkli seviyeler UV ölçeğini paylaşır.
+internal val PollenNone = Color(0xFFB0BEC5)
+
+// Sıcaklık ölçeği (haritadaki iller): soğuktan sıcağa lacivert → camgöbeği → yeşil → sarı → kırmızı.
+internal val TempFreezing = Color(0xFF3B4CC0)
+internal val TempCold = Color(0xFF4F8FE8)
+internal val TempCool = Color(0xFF3FC1C9)
+internal val TempMild = Color(0xFF6CCB7E)
+internal val TempWarm = Color(0xFFF2D04A)
+internal val TempHot = Color(0xFFF59E3B)
+internal val TempVeryHot = Color(0xFFE5484D)
+internal val TempExtreme = Color(0xFF9C1C4A)

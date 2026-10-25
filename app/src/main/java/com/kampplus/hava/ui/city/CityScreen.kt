@@ -1,7 +1,10 @@
 package com.kampplus.hava.ui.city
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,12 +23,18 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilledTonalIconButton
@@ -50,12 +59,19 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.SpanStyle
@@ -64,6 +80,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.kampplus.hava.R
@@ -71,13 +88,21 @@ import com.kampplus.hava.model.City
 import com.kampplus.hava.model.CountryFilter
 import com.kampplus.hava.model.CountryOption
 import com.kampplus.hava.ui.LoadState
+import com.kampplus.hava.ui.assistant.AssistantSheet
+import com.kampplus.hava.ui.assistant.AssistantViewModel
+import com.kampplus.hava.ui.assistant.GeneralSuggestions
+import com.kampplus.hava.ui.assistant.RobotMascot
 import com.kampplus.hava.ui.component.EmptyView
 import com.kampplus.hava.ui.component.ErrorView
 import com.kampplus.hava.ui.component.ShimmerList
 import com.kampplus.hava.ui.locale.AppLanguage
 import com.kampplus.hava.ui.theme.HavaTheme
+import com.kampplus.hava.ui.theme.MapCardBrush
 import com.kampplus.hava.ui.theme.MaxContentWidth
+import com.kampplus.hava.ui.theme.OnSky
 import com.kampplus.hava.ui.theme.ThemeMode
+import com.kampplus.hava.ui.theme.pillBrush
+import com.kampplus.hava.ui.theme.raisedCard
 import java.time.LocalTime
 
 /**
@@ -97,6 +122,7 @@ import java.time.LocalTime
 @Composable
 fun CityRoute(
     onCityClick: (City) -> Unit,
+    onOpenMap: () -> Unit = {},
     modifier: Modifier = Modifier,
     themeMode: ThemeMode = ThemeMode.SYSTEM,
     onThemeModeChange: (ThemeMode) -> Unit = {},
@@ -134,6 +160,7 @@ fun CityRoute(
             viewModel.search()
         },
         onCityClick = onCityClick,
+        onOpenMap = onOpenMap,
         modifier = modifier,
         selectedCountry = selectedCountry,
         onCountrySelect = { selectedCountry = it },
@@ -156,6 +183,7 @@ fun CityScreen(
     onQueryChange: (String) -> Unit,
     onSearch: () -> Unit,
     onCityClick: (City) -> Unit,
+    onOpenMap: () -> Unit = {},
     modifier: Modifier = Modifier,
     selectedCountry: String? = null,
     onCountrySelect: (String?) -> Unit = {},
@@ -164,24 +192,69 @@ fun CityScreen(
     language: AppLanguage = AppLanguage.SYSTEM,
     onLanguageChange: (AppLanguage) -> Unit = {}
 ) {
+    // Robot sohbeti açık mı; ekran dönünce korunur. Sohbetin kendisi ViewModel'de yaşar.
+    var assistantOpen by rememberSaveable { mutableStateOf(false) }
+    if (assistantOpen) {
+        AssistantSheet(
+            viewModel = viewModel(key = "assistant-general") { AssistantViewModel() },
+            cityName = null,
+            suggestions = GeneralSuggestions,
+            onDismiss = { assistantOpen = false }
+        )
+    }
     // `contentWindowInsets = 0`: Scaffold içeriği durum çubuğunun altından itmesin; başlığın
     // mavi degradesi ekranın en üstüne kadar uzansın. Boşlukları aşağıda kendimiz veriyoruz.
-    Scaffold(modifier = modifier, contentWindowInsets = WindowInsets(0)) { innerPadding ->
+    Scaffold(
+        modifier = modifier,
+        contentWindowInsets = WindowInsets(0),
+        // Açılışta robot büyüyerek gelir ve yardımcı olabileceğini söyler. Dokununca sohbet
+        // açılır; kullanıcı istediği şehri yazarak havayı sorabilir.
+        floatingActionButton = {
+            RobotMascot(
+                message = stringResource(R.string.bot_hello_city),
+                onClick = { assistantOpen = true },
+                modifier = Modifier.navigationBarsPadding(),
+                contentDescription = stringResource(R.string.bot_open)
+            )
+        }
+    ) { innerPadding ->
         val sky = MaterialTheme.colorScheme.primaryContainer
         val ground = MaterialTheme.colorScheme.background
+        val glow = MaterialTheme.colorScheme.primary
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                // Gökyüzü degradesi bütün ekranın arkasında: üst çeyrek tam mavi, sonra
-                // ekranın büyük kısmı boyunca yavaşça zemine karışır. Renk durakları
-                // (0f, 0.25f, 0.9f) ekran yüksekliğinin oranlarıdır.
+                // Gökyüzü degradesi bütün ekranın arkasında. Alt kısım bile zemin rengine tam
+                // dönmez, hafif mavi kalır; böylece beyaz şehir kartları her yerde zeminden ayrışır.
                 .background(
                     Brush.verticalGradient(
                         0f to sky,
-                        0.25f to sky,
-                        0.9f to ground
+                        0.3f to sky,
+                        1f to lerp(sky, ground, 0.7f)
                     )
                 )
+                // Arkaya iki yumuşak ışık halesi: sağ üstte güneş parıltısı, sol altta mavi bir ışık.
+                // `drawBehind` içeriğin arkasına çizer; yazıları ve kartları etkilemez.
+                .drawBehind {
+                    drawCircle(
+                        brush = Brush.radialGradient(
+                            listOf(SunGlow.copy(alpha = 0.55f), Color.Transparent),
+                            center = Offset(size.width * 0.92f, size.height * 0.04f),
+                            radius = size.width * 0.5f
+                        ),
+                        radius = size.width * 0.5f,
+                        center = Offset(size.width * 0.92f, size.height * 0.04f)
+                    )
+                    drawCircle(
+                        brush = Brush.radialGradient(
+                            listOf(glow.copy(alpha = 0.16f), Color.Transparent),
+                            center = Offset(size.width * 0.05f, size.height * 0.82f),
+                            radius = size.width * 0.6f
+                        ),
+                        radius = size.width * 0.6f,
+                        center = Offset(size.width * 0.05f, size.height * 0.82f)
+                    )
+                }
                 .padding(innerPadding),
             // Tablette içerik ortada, en fazla [MaxContentWidth] genişliğinde durur.
             horizontalAlignment = Alignment.CenterHorizontally
@@ -208,6 +281,7 @@ fun CityScreen(
                         onSearch = onSearch,
                         modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 24.dp)
                     )
+                    MapEntryCard(onClick = onOpenMap, modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp))
                 }
             }
             Box(
@@ -238,8 +312,8 @@ fun CityScreen(
 }
 
 /**
- * Ekranın başlığı: günün saatine göre selam, büyük soru başlığı, kısa açıklama
- * ve sağda dil ve tema düğmeleri.
+ * Ekranın başlığı: üstte selam ile dil ve tema düğmeleri, altında büyük soru başlığı
+ * ve tek satırlık kısa açıklama.
  */
 @Composable
 private fun Header(
@@ -249,23 +323,31 @@ private fun Header(
     onLanguageChange: (AppLanguage) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Row(modifier = modifier, verticalAlignment = Alignment.Top) {
-        Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        // Üst satır: solda selam, sağda dil ve tema düğmeleri. Başlık ve alt yazı alttaki
+        // satırlarda ekranın tüm genişliğini kullanır; düğmeler onları daraltmaz.
+        Row(verticalAlignment = Alignment.CenterVertically) {
             val greeting = Greeting.of(LocalTime.now())
             Text(
                 text = "${greeting.emoji}  ${stringResource(greeting.textRes)}",
                 style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.weight(1f)
             )
-            Text(text = stringResource(R.string.city_title), style = MaterialTheme.typography.displaySmall)
-            Text(
-                text = stringResource(R.string.city_header_subtitle),
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                LanguageMenu(selected = language, onSelect = onLanguageChange)
+                ThemeMenu(selected = themeMode, onSelect = onThemeModeChange)
+            }
         }
-        LanguageMenu(selected = language, onSelect = onLanguageChange)
-        ThemeMenu(selected = themeMode, onSelect = onThemeModeChange)
+        Text(text = stringResource(R.string.city_title), style = MaterialTheme.typography.displaySmall)
+        // Alt yazı her zaman tek satırdır: dar ekranda sığmazsa yazı boyutu kendiliğinden küçülür.
+        // `autoSize`, metin sığana kadar boyutu 18sp'den adım adım 12sp'ye kadar indirir.
+        BasicText(
+            text = stringResource(R.string.city_header_subtitle),
+            style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
+            maxLines = 1,
+            autoSize = TextAutoSize.StepBased(minFontSize = 12.sp, maxFontSize = MaterialTheme.typography.bodyLarge.fontSize)
+        )
     }
 }
 
@@ -290,6 +372,44 @@ private enum class Greeting(val emoji: String, @StringRes val textRes: Int) {
     }
 }
 
+/** Arka plandaki güneş parıltısının rengi: sıcak, açık bir sarı. */
+private val SunGlow = Color(0xFFFFE08A)
+
+/**
+ * Başlıktaki hap biçimli düğme: emoji, kısa etiket ve aşağı ok ("☀️ Açık ▾").
+ *
+ * Yalnızca emoji yerine etiket de yazdığı için seçili ayar okunarak anlaşılır.
+ * Emoji ve etiket ekran okuyucuya tek bir açıklama ([description]) olarak söylenir.
+ */
+@Composable
+private fun PillButton(
+    emoji: String,
+    label: String,
+    background: Brush,
+    contentColor: Color,
+    borderColor: Color,
+    description: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .shadow(elevation = 4.dp, shape = CircleShape)
+            .clip(CircleShape)
+            .background(background)
+            .border(width = 2.dp, color = borderColor, shape = CircleShape)
+            .clickable(role = Role.Button, onClick = onClick)
+            .clearAndSetSemantics { contentDescription = description }
+            .padding(start = 10.dp, end = 4.dp, top = 6.dp, bottom = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        Text(text = emoji, fontSize = 22.sp)
+        Text(text = label, style = MaterialTheme.typography.labelLarge, color = contentColor)
+        Icon(imageVector = Icons.Filled.ArrowDropDown, contentDescription = null, tint = contentColor)
+    }
+}
+
 /**
  * Dil düğmesi ve açılır menüsü: Sistem dili · Türkçe · English.
  *
@@ -302,18 +422,15 @@ private fun LanguageMenu(selected: AppLanguage, onSelect: (AppLanguage) -> Unit,
     val systemLabel = stringResource(R.string.language_system)
     val description = stringResource(R.string.language_button, selected.nativeName ?: systemLabel)
     Box(modifier = modifier) {
-        FilledTonalIconButton(
-            onClick = { expanded = true },
-            colors = IconButtonDefaults.filledTonalIconButtonColors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainerLowest
-            )
-        ) {
-            Text(
-                text = selected.emoji,
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.semantics { contentDescription = description }
-            )
-        }
+        PillButton(
+            emoji = selected.emoji,
+            label = selected.tag?.uppercase() ?: stringResource(R.string.language_auto),
+            background = SolidColor(MaterialTheme.colorScheme.surfaceContainerLowest),
+            contentColor = MaterialTheme.colorScheme.onSurface,
+            borderColor = MaterialTheme.colorScheme.primary,
+            description = description,
+            onClick = { expanded = true }
+        )
         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             AppLanguage.entries.forEach { language ->
                 DropdownMenuItem(
@@ -346,20 +463,17 @@ private fun ThemeMenu(selected: ThemeMode, onSelect: (ThemeMode) -> Unit, modifi
     var expanded by remember { mutableStateOf(false) }
     val description = stringResource(R.string.theme_button, stringResource(selected.labelRes))
     Box(modifier = modifier) {
-        // Degradenin üstünde kaybolmasın diye düğme beyaz bir dairenin içinde.
-        FilledTonalIconButton(
-            onClick = { expanded = true },
-            colors = IconButtonDefaults.filledTonalIconButtonColors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainerLowest
-            )
-        ) {
-            Text(
-                text = selected.emoji,
-                style = MaterialTheme.typography.titleLarge,
-                // Emoji bir resim gibi okunmasın; ekran okuyucu düğmenin ne işe yaradığını söylesin.
-                modifier = Modifier.semantics { contentDescription = description }
-            )
-        }
+        // Güneş gündüz mavisinin, ay gece lacivertinin üstünde: hangi temanın seçili olduğu
+        // ilk bakışta anlaşılır, güneş açık zeminde kaybolmaz.
+        PillButton(
+            emoji = selected.emoji,
+            label = stringResource(selected.labelRes),
+            background = selected.pillBrush,
+            contentColor = OnSky,
+            borderColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+            description = description,
+            onClick = { expanded = true }
+        )
         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             ThemeMode.entries.forEach { mode ->
                 DropdownMenuItem(
@@ -375,6 +489,50 @@ private fun ThemeMenu(selected: ThemeMode, onSelect: (ThemeMode) -> Unit, modifi
                     }
                 )
             }
+        }
+    }
+}
+
+/**
+ * Türkiye sıcaklık haritasını açan geniş düğme: "🗺️ Türkiye sıcaklık haritası ›".
+ *
+ * Şehir kartlarıyla karışmasın diye beyaz değil, haritanın kendi sıcaklık renkleriyle
+ * (maviden turuncuya) boyanır; yazılar beyazdır.
+ */
+@Composable
+private fun MapEntryCard(onClick: () -> Unit, modifier: Modifier = Modifier) {
+    Card(
+        onClick = onClick,
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent, contentColor = OnSky),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp, pressedElevation = 1.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MapCardBrush)
+                .padding(horizontal = 16.dp, vertical = 14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            // Emoji beyaz bir dairede: renkli zeminde de net görünsün.
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .background(OnSky.copy(alpha = 0.9f), CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = "🗺️", fontSize = 26.sp)
+            }
+            Column(modifier = Modifier.weight(1f)) {
+                Text(text = stringResource(R.string.map_open), style = MaterialTheme.typography.titleMedium)
+                Text(
+                    text = stringResource(R.string.map_open_subtitle),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = OnSky.copy(alpha = 0.9f)
+                )
+            }
+            Icon(imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null)
         }
     }
 }

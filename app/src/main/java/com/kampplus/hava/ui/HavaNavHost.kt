@@ -14,10 +14,11 @@ import com.kampplus.hava.ui.city.CityRoute
 import com.kampplus.hava.ui.forecast.ForecastRoute
 import com.kampplus.hava.ui.forecast.ForecastViewModel
 import com.kampplus.hava.ui.locale.AppLanguage
+import com.kampplus.hava.ui.map.MapRoute
 import com.kampplus.hava.ui.theme.ThemeMode
 
 /**
- * Uygulamanın iki ekranı ve aralarındaki geçiş.
+ * Uygulamanın ekranları (şehir arama, Türkiye haritası, tahmin) ve aralarındaki geçiş.
  *
  * Navigation Compose, her ekranı bir "rota" (metin adresi) ile tanımlar. Bir şehre
  * dokunulduğunda adresi üretip [NavHostController.navigate] ile o adrese gideriz;
@@ -44,10 +45,18 @@ fun HavaNavHost(
         composable(CITY_ROUTE) {
             CityRoute(
                 onCityClick = { city -> navController.navigate(forecastRoute(city)) },
+                onOpenMap = { navController.navigate(MAP_ROUTE) },
                 themeMode = themeMode,
                 onThemeModeChange = onThemeModeChange,
                 language = language,
                 onLanguageChange = onLanguageChange
+            )
+        }
+        composable(MAP_ROUTE) {
+            MapRoute(
+                onBack = { navController.popBackStack() },
+                // Haritadan seçilen il, aramadan seçilen şehirle aynı tahmin ekranını açar.
+                onOpenProvince = { province -> navController.navigate(forecastRoute(province.toCity())) }
             )
         }
         composable(
@@ -79,6 +88,9 @@ fun HavaNavHost(
 
 /** Liste ekranının adresi. */
 private const val CITY_ROUTE = "city"
+
+/** Türkiye sıcaklık haritasının adresi. */
+private const val MAP_ROUTE = "map"
 
 /** Tahmin ekranının adres şablonu; süslü parantezler çalışma anında doldurulur. */
 private const val FORECAST_ROUTE =

@@ -142,3 +142,13 @@ private fun DailyResponse?.toDailyForecasts(): List<DailyForecast> {
         )
     }
 }
+
+/** Çok noktalı isteğin tek bir noktaya ait yanıtı (bkz. [ForecastApi.getDailyMeans]). */
+data class DailyMeanResponse(val daily: DailyMeanColumns? = null)
+
+data class DailyMeanColumns(
+    @SerializedName("temperature_2m_mean")
+    val temperatureMean: List<Double?>? = null,
+    @SerializedName("weather_code")
+    val weatherCode: List<Int?>? = null
+)

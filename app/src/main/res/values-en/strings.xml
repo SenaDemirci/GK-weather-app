@@ -8,7 +8,7 @@
 
     <!-- City list screen -->
     <string name="city_title">How\'s the weather?</string>
-    <string name="city_header_subtitle">Search for a city to see current conditions, hourly and 7-day forecasts.</string>
+    <string name="city_header_subtitle">Search a city for current, hourly and 7-day forecasts.</string>
     <string name="greeting_morning">Good morning</string>
     <string name="greeting_day">Good afternoon</string>
     <string name="greeting_evening">Good evening</string>
@@ -29,6 +29,7 @@
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
     <string name="language_button">Language: %1$s</string>
+    <string name="language_auto">Auto</string>
     <string name="language_system">System language</string>
 
     <!-- Error messages -->
@@ -130,4 +131,96 @@
     <string name="tip_layers">Temperature changes by %1$d° today; wear layers you can take off.</string>
     <string name="tip_freezing">Don\'t forget gloves and a beanie; exposed skin gets cold fast.</string>
     <string name="tip_hot">Carry water and stay in the shade at midday.</string>
+
+    <!-- Weather Bot (rule-based chat) -->
+    <string name="bot_hello_city">How can I help you? We could chat about the weather, for example 🙂</string>
+    <string name="bot_hello_forecast">Ask me anything about this city\'s weather!</string>
+    <string name="bot_name">Weather Bot</string>
+    <string name="bot_open">Ask Weather Bot</string>
+    <string name="bot_subtitle">Answers your questions about %1$s</string>
+    <string name="bot_subtitle_general">Ask about the weather in any city</string>
+    <string name="bot_input_hint">Ask a question…</string>
+    <string name="bot_send">Send</string>
+    <string name="bot_close">Close</string>
+    <string name="day_today_lower">today</string>
+    <string name="day_tomorrow_lower">tomorrow</string>
+    <string name="bot_suggest_rain">Will it rain tomorrow?</string>
+    <string name="bot_suggest_wear">What should I wear today?</string>
+    <string name="bot_suggest_picnic">Is the weekend good for a picnic?</string>
+    <string name="bot_suggest_best">Which is the best day this week?</string>
+    <string name="bot_suggest_uv">How\'s the UV today?</string>
+    <string name="bot_suggest_sun">When is sunset?</string>
+    <string name="bot_greeting">Hi! I\'m Weather Bot. Ask me about rain, temperature, what to wear, UV or a good day for a picnic in %1$s.</string>
+    <string name="bot_unknown">I can\'t understand that yet. You can ask about rain, temperature, clothes, UV, sunrise/sunset, wind or a good day to go out.</string>
+    <string name="bot_thanks">You\'re welcome! I\'m here if you have another question.</string>
+    <string name="bot_out_of_range">I only have the forecast for the next 7 days.</string>
+    <string name="bot_no_data">The forecast has no data for that.</string>
+    <string name="bot_rain_now">It\'s raining right now; take your umbrella.</string>
+    <string name="bot_rain_at">Rain is expected around %1$s today (%2$d%% chance); take your umbrella.</string>
+    <string name="bot_rain_likely">%1$s: %2$d%% chance of rain; take an umbrella.</string>
+    <string name="bot_rain_maybe">%1$s: %2$d%% chance of rain; keep a small umbrella in your bag.</string>
+    <string name="bot_rain_unlikely">%1$s: no rain expected (%2$d%% chance).</string>
+    <string name="bot_temperature_day">%1$s: low %2$d°, high %3$d°.</string>
+    <string name="bot_temperature_now">Right now it\'s %1$d°, feels like %2$d°.</string>
+    <string name="bot_clothing_intro">My advice for %1$s:</string>
+    <string name="bot_clothing_items">Take: %1$s.</string>
+    <string name="bot_uv_day">%1$s: UV peaks at %2$d (%3$s).</string>
+    <string name="bot_uv_now">UV right now: %1$d.</string>
+    <string name="bot_uv_protect">Wear sunscreen and avoid the midday sun.</string>
+    <string name="bot_uv_fine">No special protection needed.</string>
+    <string name="bot_sun">%1$s: sunrise %2$s, sunset %3$s.</string>
+    <string name="bot_wind_strong">The wind is strong right now at %1$d km/h; bring something windproof. (Only current wind data is available.)</string>
+    <string name="bot_wind_calm">The wind is calm right now at %1$d km/h. (Only current wind data is available.)</string>
+    <string name="bot_outdoor_storm">%1$s: thunderstorms expected; I wouldn\'t plan anything outdoors.</string>
+    <string name="bot_outdoor_rain">%1$s isn\'t great: %2$d%% chance of rain.</string>
+    <string name="bot_outdoor_cold">%1$s is a bit cold: high of %2$d°. Fine if you dress warmly.</string>
+    <string name="bot_outdoor_hot">%1$s is very hot: high of %2$d°. Shade and plenty of water are a must.</string>
+    <string name="bot_outdoor_maybe">%1$s is okay, but there\'s a %2$d%% chance of rain; bring an umbrella.</string>
+    <string name="bot_outdoor_good">%1$s looks good for being outside: %2$s, %3$d–%4$d°, %5$d%% chance of rain.</string>
+    <string name="bot_best_day">The nicest day coming up looks like %1$s.</string>
+    <string name="bot_summary">%1$s: %2$s, low %3$d°, high %4$d°, %5$d%% chance of rain.</string>
+    <string name="bot_greeting_general">Hi! I\'m Weather Bot. If you like, let\'s chat about the weather for a bit 🙂 Type a city you\'re curious about; for example “Will it rain in Paris tomorrow?”</string>
+    <string name="bot_ask_city">Which city should I check? Add a city name to your message; for example “What\'s the weather in London?”</string>
+    <string name="bot_city_not_found">I couldn\'t find a city called “%1$s”. Could you check the spelling?</string>
+    <string name="bot_city_header">📍 %1$s</string>
+    <string name="bot_thinking">Weather Bot is typing…</string>
+    <string name="bot_suggest_city_1">What\'s the weather in London?</string>
+    <string name="bot_suggest_city_2">Will it rain in Paris tomorrow?</string>
+    <string name="bot_suggest_city_3">What should I wear in Berlin today?</string>
+    <string name="bot_suggest_city_4">Is Rome good for a picnic this weekend?</string>
+
+    <!-- Polen ve alerji -->
+    <string name="detail_pollen">Pollen &amp; Allergy</string>
+    <string name="pollen_grass">Grass</string>
+    <string name="pollen_birch">Birch</string>
+    <string name="pollen_alder">Alder</string>
+    <string name="pollen_olive">Olive</string>
+    <string name="pollen_mugwort">Mugwort</string>
+    <string name="pollen_ragweed">Ragweed</string>
+    <string name="pollen_level_none">None</string>
+    <string name="pollen_level_low">Low</string>
+    <string name="pollen_level_moderate">Moderate</string>
+    <string name="pollen_level_high">High</string>
+    <string name="pollen_level_very_high">Very high</string>
+    <string name="pollen_alert_high">Heavy pollen today: %1$s. If you have allergies, wear a mask outdoors, keep windows closed and wash your face when you get home.</string>
+    <string name="pollen_alert_moderate">Moderate pollen today: %1$s. If you have allergies, keep your medication with you.</string>
+    <string name="pollen_alert_low">Pollen is low today; an easy day for allergy sufferers.</string>
+    <string name="pollen_quiet">There\'s hardly any pollen in the air 🌿 Pollen forecasts fill up in spring and summer.</string>
+    <string name="pollen_unavailable">No pollen data for this region; pollen forecasts are only available for Europe and Türkiye.</string>
+    <string name="pollen_type_header">Type</string>
+
+    <!-- Türkiye sıcaklık haritası -->
+    <string name="map_title">Türkiye Temperature Map</string>
+    <string name="map_open">Türkiye temperature map</string>
+    <string name="map_open_subtitle">Today\'s average temperature in 81 provinces</string>
+    <string name="map_hint">Tap a province. Pinch to zoom in, double-tap to reset.</string>
+    <string name="map_select_prompt">Pick a province on the map 👆</string>
+    <string name="map_today_mean">Today\'s average %1$d°</string>
+    <string name="map_open_forecast">Forecast</string>
+    <string name="map_hottest">🔥 Warmest: %1$s %2$d°</string>
+    <string name="map_coldest">❄️ Coldest: %1$s %2$d°</string>
+    <string name="map_empty">Temperature data isn\'t available right now.</string>
+    <string name="sea_black">Black Sea</string>
+    <string name="sea_mediterranean">Mediterranean</string>
+    <string name="sea_aegean">Aegean</string>
 </resources>

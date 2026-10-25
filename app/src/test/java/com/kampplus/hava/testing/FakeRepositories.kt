@@ -1,10 +1,12 @@
 package com.kampplus.hava.testing
 
 import com.kampplus.hava.data.CityRepository
+import com.kampplus.hava.data.PollenRepository
 import com.kampplus.hava.data.WeatherRepository
 import com.kampplus.hava.model.City
 import com.kampplus.hava.model.CurrentWeather
 import com.kampplus.hava.model.Forecast
+import com.kampplus.hava.model.PollenForecast
 import java.time.LocalDateTime
 
 /**
@@ -51,6 +53,21 @@ class FakeWeatherRepository(
 
     override suspend fun getForecast(latitude: Double, longitude: Double): Forecast {
         callCount++
+        error?.let { throw it }
+        return result
+    }
+}
+
+/**
+ * @param result Her çağrıda dönecek polen tahmini; null ise bölge kapsam dışı sayılır.
+ * @param error Doluysa [getPollen] bu hatayı fırlatır.
+ */
+class FakePollenRepository(
+    var result: PollenForecast? = null,
+    var error: Throwable? = null
+) : PollenRepository {
+
+    override suspend fun getPollen(latitude: Double, longitude: Double): PollenForecast? {
         error?.let { throw it }
         return result
     }
