@@ -4,7 +4,7 @@
       Android dil İngilizce olduğunda bu dosyayı seçer.
     -->
 
-    <string name="app_name">Weather</string>
+    <string name="app_name">HavaBot</string>
 
     <!-- City list screen -->
     <string name="city_title">How\'s the weather?</string>
@@ -223,4 +223,37 @@
     <string name="sea_black">Black Sea</string>
     <string name="sea_mediterranean">Mediterranean</string>
     <string name="sea_aegean">Aegean</string>
+
+    <!-- Son bakılan şehirler -->
+    <string name="recent_title">Recently viewed</string>
+    <string name="recent_clear">Clear</string>
+    <string name="recent_remove">Remove %1$s</string>
+
+    <!-- Ayrıntılı hava ifadeleri (WMO kodu başına) -->
+    <string name="weather_clear">Clear and sunny</string>
+    <string name="weather_mainly_clear">Mainly clear</string>
+    <string name="weather_partly_cloudy">Partly cloudy</string>
+    <string name="weather_overcast">Overcast</string>
+    <string name="weather_fog">Foggy</string>
+    <string name="weather_rime_fog">Freezing fog</string>
+    <string name="weather_drizzle_light">Light drizzle</string>
+    <string name="weather_drizzle">Drizzle</string>
+    <string name="weather_drizzle_dense">Dense drizzle</string>
+    <string name="weather_freezing_drizzle">Freezing drizzle</string>
+    <string name="weather_rain_light">Light rain</string>
+    <string name="weather_rain">Rain</string>
+    <string name="weather_rain_heavy">Heavy rain</string>
+    <string name="weather_freezing_rain">Freezing rain</string>
+    <string name="weather_snow_light">Light snow</string>
+    <string name="weather_snow">Snow</string>
+    <string name="weather_snow_heavy">Heavy snow</string>
+    <string name="weather_snow_grains">Snow grains</string>
+    <string name="weather_showers_light">Light showers</string>
+    <string name="weather_showers">Showers</string>
+    <string name="weather_showers_violent">Violent showers</string>
+    <string name="weather_snow_showers_light">Light snow showers</string>
+    <string name="weather_snow_showers_heavy">Heavy snow showers</string>
+    <string name="weather_thunderstorm">Thunderstorm with showers</string>
+    <string name="weather_thunderstorm_hail">Thunderstorm with hail</string>
+    <string name="detail_later_today">Later today: %1$s</string>
 </resources>

@@ -9,7 +9,7 @@
     -->
 
     <!-- Telefonun ana ekranında görünen uygulama adı. -->
-    <string name="app_name">Hava</string>
+    <string name="app_name">HavaBot</string>
 
     <!-- Şehir listesi ekranı -->
     <string name="city_title">Hava nasıl?</string>
@@ -229,4 +229,37 @@
     <string name="sea_black">Karadeniz</string>
     <string name="sea_mediterranean">Akdeniz</string>
     <string name="sea_aegean">Ege</string>
+
+    <!-- Son bakılan şehirler -->
+    <string name="recent_title">Son bakılanlar</string>
+    <string name="recent_clear">Temizle</string>
+    <string name="recent_remove">%1$s listeden kaldır</string>
+
+    <!-- Ayrıntılı hava ifadeleri (WMO kodu başına) -->
+    <string name="weather_clear">Açık ve güneşli</string>
+    <string name="weather_mainly_clear">Az bulutlu</string>
+    <string name="weather_partly_cloudy">Parçalı bulutlu</string>
+    <string name="weather_overcast">Kapalı</string>
+    <string name="weather_fog">Sisli</string>
+    <string name="weather_rime_fog">Kırağılı sisli</string>
+    <string name="weather_drizzle_light">Hafif çiseleyen</string>
+    <string name="weather_drizzle">Çiseleyen</string>
+    <string name="weather_drizzle_dense">Yoğun çiseleyen</string>
+    <string name="weather_freezing_drizzle">Dondurucu çiseleyen</string>
+    <string name="weather_rain_light">Hafif yağmurlu</string>
+    <string name="weather_rain">Yağmurlu</string>
+    <string name="weather_rain_heavy">Şiddetli yağmurlu</string>
+    <string name="weather_freezing_rain">Dondurucu yağmurlu</string>
+    <string name="weather_snow_light">Hafif kar yağışlı</string>
+    <string name="weather_snow">Kar yağışlı</string>
+    <string name="weather_snow_heavy">Yoğun kar yağışlı</string>
+    <string name="weather_snow_grains">Kar taneli</string>
+    <string name="weather_showers_light">Hafif sağanak yağışlı</string>
+    <string name="weather_showers">Sağanak yağışlı</string>
+    <string name="weather_showers_violent">Kuvvetli sağanak yağışlı</string>
+    <string name="weather_snow_showers_light">Hafif kar sağanaklı</string>
+    <string name="weather_snow_showers_heavy">Yoğun kar sağanaklı</string>
+    <string name="weather_thunderstorm">Gök gürültülü sağanak yağışlı</string>
+    <string name="weather_thunderstorm_hail">Dolu ile gök gürültülü fırtına</string>
+    <string name="detail_later_today">Gün içinde: %1$s</string>
 </resources>

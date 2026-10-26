@@ -1,11 +1,12 @@
 ## Yenilikler
 
-Kurs projesinin üzerine eklenen özellikler:
+Uygulamanın yeni adı **HavaBot**. Kurs projesinin üzerine eklenen özellikler:
 
 - **Yeni tasarım:** gökyüzü mavisi tema, daha büyük ve kalın yazılar, açık / koyu / sistem teması seçimi.
 - **Türkçe ve İngilizce:** uygulama içinden dil seçimi; ilk açılışta Türkçe.
 - **Şehir arama:** sonuçları ülkeye göre süzme; arama metni ekran dönünce korunur.
-- **Tahmin ekranı:** havaya göre renklenen ana kart, saatlik tahminde saat aralığı filtresi (Sabah, Öğle, Akşam, Gece), "Şimdi" ve "Yarın" etiketleri, 7 günlük sıcaklık çubukları.
+- **Son bakılanlar:** tahminine bakılan şehirler şehir ekranında listelenir, tek dokunuşla tekrar açılır; uygulama kapansa da hatırlanır.
+- **Tahmin ekranı:** havaya göre renklenen ana kart ve arkasında canlı hava animasyonları (güneş, bulut, yağmur, kar, şimşek, sis), "Hafif sağanak yağışlı" gibi ayrıntılı hava ifadeleri, saatlik tahminde saat aralığı filtresi (Sabah, Öğle, Akşam, Gece), "Şimdi" ve "Yarın" etiketleri, 7 günlük sıcaklık çubukları.
 - **Ne giymeli?:** sıcaklık, yağmur, rüzgâr ve UV'ye göre kıyafet önerileri ve "şemsiyeni al" gibi ipuçları.
 - **Güneş ve UV:** gün doğumu, gün batımı, gün uzunluğu ve renkli UV göstergesi.
 - **Polen ve Alerji:** 6 polen türü için uyarı ve 4 günlük renkli tablo (Avrupa ve Türkiye).
@@ -24,7 +25,7 @@ git clone https://github.com/SenaDemirci/GK-weather-app.git
 
 </div>
 
-# Hava — Şehir Arama ve Hava Tahmini
+# HavaBot — Şehir Arama ve Hava Tahmini
 
 Bilişim Kampı Android eğitiminin **referans çözümü**. Open-Meteo servisinden şehir arar, seçilen şehrin anlık durumunu, saatlik ve 7 günlük tahminini gösterir; yükleniyor / veri / boş / hata durumlarının tamamını ele alır.
 

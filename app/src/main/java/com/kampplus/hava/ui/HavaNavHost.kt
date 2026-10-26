@@ -2,13 +2,18 @@ package com.kampplus.hava.ui
 
 import android.net.Uri
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.kampplus.hava.data.SharedPreferencesRecentCities
 import com.kampplus.hava.model.City
 import com.kampplus.hava.ui.city.CityRoute
 import com.kampplus.hava.ui.forecast.ForecastRoute
@@ -37,6 +42,19 @@ fun HavaNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController()
 ) {
+    // Son bakılan şehirler. Uygulama bağlamıyla (applicationContext) kurulur; Activity dil
+    // değişince yeniden kurulsa da liste cihazdan tekrar okunur, kaybolmaz.
+    val context = LocalContext.current
+    val recentCities = remember { SharedPreferencesRecentCities(context.applicationContext) }
+    val recent by recentCities.cities.collectAsStateWithLifecycle()
+
+    // Tahmin ekranı hangi yoldan açılırsa açılsın (arama, son bakılanlar, harita) şehir
+    // listenin başına yazılır.
+    val openForecast: (City) -> Unit = { city ->
+        recentCities.add(city)
+        navController.navigate(forecastRoute(city))
+    }
+
     NavHost(
         navController = navController,
         startDestination = CITY_ROUTE,
@@ -44,8 +62,11 @@ fun HavaNavHost(
     ) {
         composable(CITY_ROUTE) {
             CityRoute(
-                onCityClick = { city -> navController.navigate(forecastRoute(city)) },
+                onCityClick = openForecast,
                 onOpenMap = { navController.navigate(MAP_ROUTE) },
+                recentCities = recent,
+                onRemoveRecent = recentCities::remove,
+                onClearRecent = recentCities::clear,
                 themeMode = themeMode,
                 onThemeModeChange = onThemeModeChange,
                 language = language,
@@ -56,7 +77,7 @@ fun HavaNavHost(
             MapRoute(
                 onBack = { navController.popBackStack() },
                 // Haritadan seçilen il, aramadan seçilen şehirle aynı tahmin ekranını açar.
-                onOpenProvince = { province -> navController.navigate(forecastRoute(province.toCity())) }
+                onOpenProvince = { province -> openForecast(province.toCity()) }
             )
         }
         composable(

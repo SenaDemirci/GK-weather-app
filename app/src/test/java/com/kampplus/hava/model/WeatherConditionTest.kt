@@ -1,6 +1,8 @@
 package com.kampplus.hava.model
 
+import com.kampplus.hava.R
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
 import org.junit.Test
 
 /**
@@ -43,5 +45,23 @@ class WeatherConditionTest {
             assert(condition.emoji.isNotBlank()) { "${condition.name} için emoji boş" }
             assert(condition.labelRes != 0) { "${condition.name} için etiket yok" }
         }
+    }
+
+    @Test
+    fun `ayrintili ifade siddet farkini soyler`() {
+        // Üçü de "Yağmurlu" grubunda ama ayrıntılı ifadeleri farklı.
+        assertEquals(R.string.weather_rain_light, WeatherCondition.detailLabelRes(61))
+        assertEquals(R.string.weather_rain_heavy, WeatherCondition.detailLabelRes(65))
+        assertEquals(R.string.weather_showers, WeatherCondition.detailLabelRes(81))
+        assertEquals(R.string.weather_showers_violent, WeatherCondition.detailLabelRes(82))
+    }
+
+    @Test
+    fun `taninan her kodun kendi ayrintili ifadesi vardir, taninmayan kod grubun adini alir`() {
+        val known = listOf(0, 1, 2, 3, 45, 48, 51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 71, 73, 75, 77, 80, 81, 82, 85, 86, 95, 96, 99)
+        known.forEach { code ->
+            assertNotEquals("$code için ifade yok", R.string.condition_unknown, WeatherCondition.detailLabelRes(code))
+        }
+        assertEquals(R.string.condition_unknown, WeatherCondition.detailLabelRes(12345))
     }
 }

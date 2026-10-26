@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -32,6 +33,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -50,6 +52,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -76,7 +79,9 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -123,6 +128,9 @@ import java.time.LocalTime
 fun CityRoute(
     onCityClick: (City) -> Unit,
     onOpenMap: () -> Unit = {},
+    recentCities: List<City> = emptyList(),
+    onRemoveRecent: (City) -> Unit = {},
+    onClearRecent: () -> Unit = {},
     modifier: Modifier = Modifier,
     themeMode: ThemeMode = ThemeMode.SYSTEM,
     onThemeModeChange: (ThemeMode) -> Unit = {},
@@ -161,6 +169,9 @@ fun CityRoute(
         },
         onCityClick = onCityClick,
         onOpenMap = onOpenMap,
+        recentCities = recentCities,
+        onRemoveRecent = onRemoveRecent,
+        onClearRecent = onClearRecent,
         modifier = modifier,
         selectedCountry = selectedCountry,
         onCountrySelect = { selectedCountry = it },
@@ -184,6 +195,9 @@ fun CityScreen(
     onSearch: () -> Unit,
     onCityClick: (City) -> Unit,
     onOpenMap: () -> Unit = {},
+    recentCities: List<City> = emptyList(),
+    onRemoveRecent: (City) -> Unit = {},
+    onClearRecent: () -> Unit = {},
     modifier: Modifier = Modifier,
     selectedCountry: String? = null,
     onCountrySelect: (String?) -> Unit = {},
@@ -282,6 +296,15 @@ fun CityScreen(
                         modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 24.dp)
                     )
                     MapEntryCard(onClick = onOpenMap, modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp))
+                    if (recentCities.isNotEmpty()) {
+                        RecentCitiesRow(
+                            cities = recentCities,
+                            onCityClick = onCityClick,
+                            onRemove = onRemoveRecent,
+                            onClear = onClearRecent,
+                            modifier = Modifier.padding(top = 16.dp)
+                        )
+                    }
                 }
             }
             Box(
@@ -511,28 +534,107 @@ private fun MapEntryCard(onClick: () -> Unit, modifier: Modifier = Modifier) {
             modifier = Modifier
                 .fillMaxWidth()
                 .background(MapCardBrush)
-                .padding(horizontal = 16.dp, vertical = 14.dp),
+                .padding(horizontal = 18.dp, vertical = 18.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(14.dp)
         ) {
             // Emoji beyaz bir dairede: renkli zeminde de net görünsün.
             Box(
                 modifier = Modifier
-                    .size(48.dp)
+                    .size(58.dp)
                     .background(OnSky.copy(alpha = 0.9f), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = "🗺️", fontSize = 26.sp)
+                Text(text = "🗺️", fontSize = 32.sp)
             }
             Column(modifier = Modifier.weight(1f)) {
-                Text(text = stringResource(R.string.map_open), style = MaterialTheme.typography.titleMedium)
+                // Başlık ve alt yazı büyük ve kalın: düğme ekranda ilk bakışta okunsun.
+                Text(text = stringResource(R.string.map_open), style = MaterialTheme.typography.titleLarge)
                 Text(
                     text = stringResource(R.string.map_open_subtitle),
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
                     color = OnSky.copy(alpha = 0.9f)
                 )
             }
-            Icon(imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null)
+            Icon(imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, modifier = Modifier.size(32.dp))
+        }
+    }
+}
+
+/**
+ * "Son bakılanlar": tahminine bakılan şehirler, en yenisi başta, yana kaydırılabilir kartlar.
+ *
+ * Karta dokununca o şehrin tahmini açılır; köşedeki ✕ şehri listeden çıkarır,
+ * başlıktaki "Temizle" bütün listeyi siler.
+ */
+@Composable
+private fun RecentCitiesRow(
+    cities: List<City>,
+    onCityClick: (City) -> Unit,
+    onRemove: (City) -> Unit,
+    onClear: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(modifier = Modifier.padding(start = 20.dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = stringResource(R.string.recent_title),
+                // "Sonuçlar" başlığıyla aynı boyut: iki bölüm başlığı eşit ağırlıkta görünsün.
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.weight(1f)
+            )
+            TextButton(onClick = onClear) { Text(stringResource(R.string.recent_clear)) }
+        }
+        LazyRow(
+            contentPadding = PaddingValues(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            items(items = cities, key = { "${it.name}|${it.latitude}|${it.longitude}" }) { city ->
+                RecentCityCard(city = city, onClick = { onCityClick(city) }, onRemove = { onRemove(city) })
+            }
+        }
+    }
+}
+
+/** Son bakılan tek bir şehir: bayrak, ad ve il/ülke; sağ üstte kaldırma düğmesi. */
+@Composable
+private fun RecentCityCard(city: City, onClick: () -> Unit, onRemove: () -> Unit) {
+    Card(
+        onClick = onClick,
+        modifier = Modifier.width(200.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.raisedCard),
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+    ) {
+        Row(
+            modifier = Modifier.padding(start = 12.dp, top = 10.dp, bottom = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Text(text = city.countryCode?.let(::flagEmoji) ?: "📍", fontSize = 24.sp)
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = city.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = city.subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+            IconButton(onClick = onRemove, modifier = Modifier.size(36.dp)) {
+                Icon(
+                    imageVector = Icons.Filled.Close,
+                    contentDescription = stringResource(R.string.recent_remove, city.name),
+                    modifier = Modifier.size(18.dp),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         }
     }
 }

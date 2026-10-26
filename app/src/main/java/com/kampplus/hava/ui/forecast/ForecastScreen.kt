@@ -1,5 +1,10 @@
 package com.kampplus.hava.ui.forecast
 
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -11,6 +16,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -260,11 +266,33 @@ private fun ForecastContent(subtitle: String, forecast: Forecast, pollen: LoadSt
 @Composable
 private fun CurrentWeatherHeader(subtitle: String, current: CurrentWeather, today: DailyForecast?, modifier: Modifier = Modifier) {
     val condition = WeatherCondition.fromWeatherCode(current.weatherCode)
-    Column(
+    // Emoji yavaşça yukarı aşağı süzülür; kartın arkasında hava durumuna göre animasyon oynar.
+    val float by rememberInfiniteTransition(label = "heroEmoji").animateFloat(
+        initialValue = -4f,
+        targetValue = 4f,
+        animationSpec = infiniteRepeatable(tween(durationMillis = 2_000), RepeatMode.Reverse),
+        label = "heroEmojiFloat"
+    )
+    Box(
         modifier = modifier
             .clip(MaterialTheme.shapes.extraLarge)
             .background(condition.skyBrush())
-            .padding(24.dp),
+    ) {
+        WeatherAnimation(condition = condition, modifier = Modifier.matchParentSize())
+        HeroContent(subtitle = subtitle, current = current, today = today, condition = condition, emojiOffsetDp = float)
+    }
+}
+
+@Composable
+private fun HeroContent(
+    subtitle: String,
+    current: CurrentWeather,
+    today: DailyForecast?,
+    condition: WeatherCondition,
+    emojiOffsetDp: Float
+) {
+    Column(
+        modifier = Modifier.padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         Text(text = subtitle, style = MaterialTheme.typography.titleMedium, color = OnSky.copy(alpha = 0.85f))
@@ -275,9 +303,19 @@ private fun CurrentWeatherHeader(subtitle: String, current: CurrentWeather, toda
                 color = OnSky,
                 modifier = Modifier.weight(1f)
             )
-            Text(text = condition.emoji, fontSize = 72.sp)
+            Text(text = condition.emoji, fontSize = 72.sp, modifier = Modifier.offset(y = emojiOffsetDp.dp))
         }
-        Text(text = stringResource(condition.labelRes), style = MaterialTheme.typography.headlineSmall, color = OnSky)
+        // Ayrıntılı ifade: "Kapalı" yerine örneğin "Hafif sağanak yağışlı".
+        val nowLabel = WeatherCondition.detailLabelRes(current.weatherCode)
+        Text(text = stringResource(nowLabel), style = MaterialTheme.typography.headlineSmall, color = OnSky)
+        // Gün içinde başka bir hava bekleniyorsa onu da söyle: "Gün içinde: Sağanak yağışlı".
+        today?.let { WeatherCondition.detailLabelRes(it.weatherCode) }?.takeIf { it != nowLabel }?.let { laterLabel ->
+            Text(
+                text = stringResource(R.string.detail_later_today, stringResource(laterLabel)),
+                style = MaterialTheme.typography.titleMedium,
+                color = OnSky
+            )
+        }
         today?.let {
             Text(
                 text = stringResource(R.string.detail_high_low, degrees(it.maxTemperatureC), degrees(it.minTemperatureC)),
@@ -653,13 +691,21 @@ private fun DailyRow(day: DailyForecast, isToday: Boolean, weekMin: Double, week
             .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = if (isToday) stringResource(R.string.today) else dayName(day.date),
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = if (isToday) FontWeight.SemiBold else null,
-            maxLines = 1,
-            modifier = Modifier.width(124.dp)
-        )
+        // Gün adının altında o günün hava ifadesi: "Sağanak yağışlı".
+        Column(modifier = Modifier.width(124.dp)) {
+            Text(
+                text = if (isToday) stringResource(R.string.today) else dayName(day.date),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = if (isToday) FontWeight.SemiBold else null,
+                maxLines = 1
+            )
+            Text(
+                text = stringResource(WeatherCondition.detailLabelRes(day.weatherCode)),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 2
+            )
+        }
         Column(modifier = Modifier.width(48.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Text(text = WeatherCondition.fromWeatherCode(day.weatherCode).emoji, style = MaterialTheme.typography.titleLarge)
             percent(day.precipitationProbability)?.let {

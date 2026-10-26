@@ -46,5 +46,44 @@ enum class WeatherCondition(val emoji: String, @StringRes val labelRes: Int) {
             95, 96, 99 -> THUNDERSTORM
             else -> UNKNOWN
         }
+
+        /**
+         * Kodun ayrıntılı, cümle içinde kullanılabilen karşılığı: "Hafif yağmurlu",
+         * "Kuvvetli sağanak yağışlı", "Dolu ile fırtına"...
+         *
+         * [fromWeatherCode] kodları kabaca gruplar (emoji ve animasyon için yeterli);
+         * bu fonksiyon ise WMO tablosundaki şiddet farkını da söyler: 61, 63 ve 65 hepsi
+         * yağmurdur ama sırasıyla hafif, orta ve şiddetli. Tanınmayan kod için grubun
+         * genel adı döner.
+         */
+        @StringRes
+        fun detailLabelRes(code: Int): Int = when (code) {
+            0 -> R.string.weather_clear
+            1 -> R.string.weather_mainly_clear
+            2 -> R.string.weather_partly_cloudy
+            3 -> R.string.weather_overcast
+            45 -> R.string.weather_fog
+            48 -> R.string.weather_rime_fog
+            51 -> R.string.weather_drizzle_light
+            53 -> R.string.weather_drizzle
+            55 -> R.string.weather_drizzle_dense
+            56, 57 -> R.string.weather_freezing_drizzle
+            61 -> R.string.weather_rain_light
+            63 -> R.string.weather_rain
+            65 -> R.string.weather_rain_heavy
+            66, 67 -> R.string.weather_freezing_rain
+            71 -> R.string.weather_snow_light
+            73 -> R.string.weather_snow
+            75 -> R.string.weather_snow_heavy
+            77 -> R.string.weather_snow_grains
+            80 -> R.string.weather_showers_light
+            81 -> R.string.weather_showers
+            82 -> R.string.weather_showers_violent
+            85 -> R.string.weather_snow_showers_light
+            86 -> R.string.weather_snow_showers_heavy
+            95 -> R.string.weather_thunderstorm
+            96, 99 -> R.string.weather_thunderstorm_hail
+            else -> fromWeatherCode(code).labelRes
+        }
     }
 }

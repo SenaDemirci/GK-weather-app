@@ -195,7 +195,9 @@ private fun SelectedProvinceCard(selected: ProvinceTemperature?, onOpen: (Provin
                 selected.meanC?.let {
                     Text(text = stringResource(R.string.map_today_mean, it.roundToInt()), style = MaterialTheme.typography.bodyLarge)
                 }
-                condition?.let { Text(text = stringResource(it.labelRes), style = MaterialTheme.typography.bodyMedium) }
+                selected.weatherCode?.let {
+                    Text(text = stringResource(WeatherCondition.detailLabelRes(it)), style = MaterialTheme.typography.bodyMedium)
+                }
             }
             Button(
                 onClick = { onOpen(selected.province) },
