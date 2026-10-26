@@ -90,3 +90,6 @@ internal val TempWarm = Color(0xFFF2D04A)
 internal val TempHot = Color(0xFFF59E3B)
 internal val TempVeryHot = Color(0xFFE5484D)
 internal val TempExtreme = Color(0xFF9C1C4A)
+
+// Arka plandaki güneş parıltısı: sıcak, açık bir sarı.
+internal val SunGlowLight = Color(0xFFFFE08A)

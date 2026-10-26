@@ -1,6 +1,7 @@
 package com.kampplus.hava.ui.assistant
 
 import com.kampplus.hava.R
+import com.kampplus.hava.model.City
 import com.kampplus.hava.model.DailyForecast
 import com.kampplus.hava.model.ReplyLine
 import com.kampplus.hava.testing.FakeCityRepository
@@ -29,7 +30,8 @@ class AssistantViewModelTest {
     private val cities = FakeCityRepository(result = listOf(sampleCity(name = "İzmir")))
     private val weather = FakeWeatherRepository()
 
-    private fun createViewModel(initialCity: AssistantCity? = null) = AssistantViewModel(initialCity, cities, weather)
+    private fun createViewModel(initialCity: AssistantCity? = null, fallback: City? = null) =
+        AssistantViewModel(initialCity, cities, weather, fallbackCity = { fallback })
 
     private fun AssistantViewModel.lastBot() = (messages.value.last() as ChatMessage.Bot).reply.lines
 
@@ -114,6 +116,21 @@ class AssistantViewModelTest {
 
         assertEquals(0, cities.callCount)
         assertEquals(R.string.bot_temperature_day, viewModel.lastBot().first().res)
+    }
+
+    @Test
+    fun `sehir yazilmazsa en son bakilan sehir kullanilir`() = runTest {
+        val viewModel = createViewModel(fallback = sampleCity(name = "Bursa"))
+
+        viewModel.ask("Bugün hava nasıl?")
+        advanceUntilIdle()
+
+        // Şehir aranmaz; son bakılan şehrin tahmini çekilir ve başlıkta adı yazar.
+        assertEquals(0, cities.callCount)
+        assertEquals(1, weather.callCount)
+        val header = viewModel.lastBot().first()
+        assertEquals(R.string.bot_city_header, header.res)
+        assertTrue((header.args.first() as com.kampplus.hava.model.ReplyArg.Text).value.startsWith("Bursa"))
     }
 
     @Test

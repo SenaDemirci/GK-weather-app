@@ -5,6 +5,7 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -47,6 +48,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -57,9 +59,12 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -93,6 +98,7 @@ import com.kampplus.hava.ui.theme.OnSky
 import com.kampplus.hava.ui.theme.UvScaleColors
 import com.kampplus.hava.ui.theme.color
 import com.kampplus.hava.ui.theme.raisedCard
+import com.kampplus.hava.ui.theme.skyBackground
 import com.kampplus.hava.ui.theme.skyBrush
 import java.time.Duration
 import java.time.LocalDate
@@ -140,8 +146,10 @@ fun ForecastScreen(
 ) {
     // Robot paneli açık mı; ekran dönünce korunur. Sohbetin kendisi ViewModel'de yaşar.
     var assistantOpen by rememberSaveable { mutableStateOf(false) }
+    // Arama ekranıyla aynı gökyüzü zemini; Scaffold ve üst çubuk saydam, zemin arkadan görünür.
     Scaffold(
-        modifier = modifier,
+        modifier = modifier.skyBackground(),
+        containerColor = Color.Transparent,
         // Robot yalnızca tahmin geldiğinde görünür; boş tahminle konuşacak bir şey yok.
         floatingActionButton = {
             if (uiState is LoadState.Success) {
@@ -155,7 +163,7 @@ fun ForecastScreen(
         topBar = {
             TopAppBar(
                 title = { Text(cityName.ifEmpty { stringResource(R.string.detail_title) }) },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
@@ -251,8 +259,11 @@ private fun ForecastContent(subtitle: String, forecast: Forecast, pollen: LoadSt
             now = now,
             modifier = contentModifier.padding(top = 12.dp)
         )
-        SectionTitle(stringResource(R.string.detail_daily), contentModifier)
-        DailyCard(days = forecast.daily, modifier = contentModifier.padding(horizontal = 16.dp))
+        // Günlük tahmin iki sekmeli: 7 ve 15 gün. Seçili sekme ekran dönünce korunur.
+        var dayCount by rememberSaveable { mutableIntStateOf(SHORT_DAYS) }
+        SectionTitle(stringResource(R.string.detail_daily_title), contentModifier)
+        DayCountTabs(selected = dayCount, onSelect = { dayCount = it }, modifier = contentModifier)
+        DailyCard(days = forecast.daily.take(dayCount), modifier = contentModifier.padding(horizontal = 16.dp))
     }
 }
 
@@ -295,11 +306,11 @@ private fun HeroContent(
         modifier = Modifier.padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        Text(text = subtitle, style = MaterialTheme.typography.titleMedium, color = OnSky.copy(alpha = 0.85f))
+        Text(text = subtitle, style = MaterialTheme.typography.titleLarge.onSky())
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = degrees(current.temperatureC),
-                style = MaterialTheme.typography.displayLarge,
+                style = MaterialTheme.typography.displayLarge.onSky(),
                 color = OnSky,
                 modifier = Modifier.weight(1f)
             )
@@ -307,20 +318,20 @@ private fun HeroContent(
         }
         // Ayrıntılı ifade: "Kapalı" yerine örneğin "Hafif sağanak yağışlı".
         val nowLabel = WeatherCondition.detailLabelRes(current.weatherCode)
-        Text(text = stringResource(nowLabel), style = MaterialTheme.typography.headlineSmall, color = OnSky)
+        Text(text = stringResource(nowLabel), style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold).onSky())
         // Gün içinde başka bir hava bekleniyorsa onu da söyle: "Gün içinde: Sağanak yağışlı".
         today?.let { WeatherCondition.detailLabelRes(it.weatherCode) }?.takeIf { it != nowLabel }?.let { laterLabel ->
             Text(
                 text = stringResource(R.string.detail_later_today, stringResource(laterLabel)),
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleLarge.onSky(),
                 color = OnSky
             )
         }
         today?.let {
             Text(
                 text = stringResource(R.string.detail_high_low, degrees(it.maxTemperatureC), degrees(it.minTemperatureC)),
-                style = MaterialTheme.typography.titleMedium,
-                color = OnSky.copy(alpha = 0.85f)
+                style = MaterialTheme.typography.titleLarge.onSky(),
+                color = OnSky
             )
         }
         Row(
@@ -364,7 +375,10 @@ private fun ClothingCard(advice: ClothingAdvice, modifier: Modifier = Modifier) 
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.secondaryContainer,
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer
-        )
+        ),
+        // Zemin de açık mavi olduğu için çerçeve ve gölgeyle ayrışır.
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
+        border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.35f))
     ) {
         Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
             Text(text = stringResource(advice.summaryRes), style = MaterialTheme.typography.titleLarge)
@@ -560,6 +574,20 @@ private fun HourRangeFilter(selected: HourRange, onSelect: (HourRange) -> Unit, 
         items(items = HourRange.entries, key = { it.name }) { range ->
             FilterChip(
                 selected = range == selected,
+                // Bütün çipler beyaz; seçili olan kalın, koyu mavi bir çerçeveyle belli olur.
+                colors = FilterChipDefaults.filterChipColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+                    selectedContainerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+                    selectedLabelColor = MaterialTheme.colorScheme.primary,
+                    selectedLeadingIconColor = MaterialTheme.colorScheme.primary
+                ),
+                border = FilterChipDefaults.filterChipBorder(
+                    enabled = true,
+                    selected = range == selected,
+                    borderColor = MaterialTheme.colorScheme.outlineVariant,
+                    selectedBorderColor = MaterialTheme.colorScheme.primary,
+                    selectedBorderWidth = 2.5.dp
+                ),
                 onClick = { onSelect(range) },
                 label = {
                     Text(
@@ -612,15 +640,16 @@ private fun HourlyRow(hours: List<HourlyForecast>, now: LocalDateTime, modifier:
     ) {
         items(items = hours, key = { it.time.toString() }) { hour ->
             val isNow = hour.time == now
+            // Bütün saatler beyaz kart; "Şimdi" kalın, koyu mavi bir çerçeveyle öne çıkar.
             Card(
                 modifier = Modifier.width(84.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = if (isNow) {
-                        MaterialTheme.colorScheme.primaryContainer
-                    } else {
-                        MaterialTheme.colorScheme.raisedCard
-                    }
-                )
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.raisedCard),
+                elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
+                border = if (isNow) {
+                    BorderStroke(3.dp, MaterialTheme.colorScheme.primary)
+                } else {
+                    BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+                }
             ) {
                 Column(
                     modifier = Modifier
@@ -655,6 +684,38 @@ private fun HourlyRow(hours: List<HourlyForecast>, now: LocalDateTime, modifier:
                     )
                 }
             }
+        }
+    }
+}
+
+/**
+ * "7 Günlük" ve "15 Günlük" sekmeleri. Saat aralığı çipleriyle aynı görünüm: hepsi beyaz,
+ * seçili olan koyu mavi çerçeveli. Üstünde "Günlük Tahmin" başlığı durur.
+ */
+@Composable
+private fun DayCountTabs(selected: Int, onSelect: (Int) -> Unit, modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier.padding(start = 16.dp, end = 16.dp, bottom = 12.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        listOf(SHORT_DAYS to R.string.detail_daily, LONG_DAYS to R.string.detail_daily_15).forEach { (days, label) ->
+            FilterChip(
+                selected = days == selected,
+                onClick = { onSelect(days) },
+                label = { Text(text = stringResource(label), style = MaterialTheme.typography.titleMedium) },
+                colors = FilterChipDefaults.filterChipColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+                    selectedContainerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+                    selectedLabelColor = MaterialTheme.colorScheme.primary
+                ),
+                border = FilterChipDefaults.filterChipBorder(
+                    enabled = true,
+                    selected = days == selected,
+                    borderColor = MaterialTheme.colorScheme.outlineVariant,
+                    selectedBorderColor = MaterialTheme.colorScheme.primary,
+                    selectedBorderWidth = 2.5.dp
+                )
+            )
         }
     }
 }
@@ -768,14 +829,15 @@ private fun Metric(emoji: String, label: String, value: String, modifier: Modifi
     Column(
         modifier = modifier
             .clip(MaterialTheme.shapes.medium)
-            .background(OnSky.copy(alpha = 0.16f))
+            // Biraz daha koyu zemin: arkadaki animasyon kutucuğun yazısını bastırmasın.
+            .background(Color.Black.copy(alpha = 0.18f))
             .padding(vertical = 12.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
-        Text(text = emoji, style = MaterialTheme.typography.titleLarge)
-        Text(text = value, style = MaterialTheme.typography.titleLarge, color = OnSky)
-        Text(text = label, style = MaterialTheme.typography.titleSmall, color = OnSky.copy(alpha = 0.85f))
+        Text(text = emoji, style = MaterialTheme.typography.headlineSmall)
+        Text(text = value, style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold).onSky())
+        Text(text = label, style = MaterialTheme.typography.titleMedium.onSky())
     }
 }
 
@@ -787,6 +849,18 @@ private fun SectionTitle(text: String, modifier: Modifier = Modifier) {
         modifier = modifier.padding(start = 20.dp, end = 20.dp, top = 24.dp, bottom = 12.dp)
     )
 }
+
+/**
+ * Gökyüzü kartındaki yazıların stili: beyaz ve hafif gölgeli.
+ *
+ * Kartın arkasında bulut, yağmur ve kar animasyonu oynadığı için düz beyaz yazı bazen
+ * açık renkli bir bulutun üstüne denk gelir; altındaki yumuşak koyu gölge yazıyı her
+ * zaman okunur tutar.
+ */
+private fun TextStyle.onSky(): TextStyle = copy(
+    color = OnSky,
+    shadow = Shadow(color = Color.Black.copy(alpha = 0.35f), offset = Offset(0f, 2f), blurRadius = 6f)
+)
 
 /** 18.4 → "18°". Kullanıcıya ondalık göstermeye gerek yok. */
 private fun degrees(celsius: Double) = "${celsius.roundToInt()}°"
@@ -812,6 +886,10 @@ private fun dayName(date: LocalDate): String {
 }
 
 private const val HOURLY_COUNT = 24
+
+/** Günlük tahmin sekmelerinin gün sayıları. */
+private const val SHORT_DAYS = 7
+private const val LONG_DAYS = 15
 private val HOUR_FORMAT: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
 @Preview(showBackground = true)

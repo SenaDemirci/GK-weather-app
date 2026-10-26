@@ -147,6 +147,16 @@ class WeatherAssistantTest {
     }
 
     @Test
+    fun `15 gunluk tahminde de hafta sorulari ilk 7 gune bakar`() {
+        // 8. günden sonra bulutsuz, 23° ve yağışsız "mükemmel" günler: hafta sorusunda seçilmemeli.
+        val longForecast = forecast.copy(daily = forecast.daily + List(8) { day(7L + it, 18.0, 23.0, rain = 0) })
+
+        val reply = WeatherAssistant.reply("Bu hafta en güzel gün hangisi?", longForecast, "İstanbul")
+
+        assertEquals(forecast.daily[2].date, reply.firstDay())
+    }
+
+    @Test
     fun `uv sorusu seviye ve onlemle yanitlanir`() {
         val reply = ask("UV nasıl?")
 
@@ -171,6 +181,15 @@ class WeatherAssistantTest {
         val short = forecast.copy(daily = forecast.daily.take(1))
 
         assertEquals(R.string.bot_out_of_range, WeatherAssistant.reply("yarın yağmur", short, "X").firstRes())
+    }
+
+    @Test
+    fun `konusu anlasilmayan ama gun iceren soru o gunun ozetiyle yanitlanir`() {
+        // Klavye "hava nasıl"ı "have nsil" yapsa da "yarın" anlaşılır.
+        val reply = ask("yarin have nsil")
+
+        assertEquals(R.string.bot_summary, reply.firstRes())
+        assertEquals(now.toLocalDate().plusDays(1), reply.firstDay())
     }
 
     @Test

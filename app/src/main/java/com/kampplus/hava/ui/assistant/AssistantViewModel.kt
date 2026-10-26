@@ -10,6 +10,7 @@ import com.kampplus.hava.data.OpenMeteoCityRepository
 import com.kampplus.hava.data.OpenMeteoWeatherRepository
 import com.kampplus.hava.data.WeatherRepository
 import com.kampplus.hava.model.AssistantReply
+import com.kampplus.hava.model.City
 import com.kampplus.hava.model.CityMention
 import com.kampplus.hava.model.Forecast
 import com.kampplus.hava.model.ReplyArg
@@ -60,17 +61,20 @@ data class AssistantCity(val name: String, val subtitle: String, val forecast: F
  * 2. Değilse sorudaki şehir adayları ([CityMention]) şehir arama servisinde aranır;
  *    bulunan ilk şehrin tahmini çekilir ve sohbet artık o şehir hakkında konuşur.
  * 3. Soruda şehir yoksa son konuşulan şehir kullanılır ("İzmir hava nasıl?" → "ya yarın?").
- * 4. Hiç şehir yoksa robot hangi şehri merak ettiğini sorar.
+ * 4. Sohbette henüz şehir yoksa en son bakılan şehir ([fallbackCity]) kullanılır.
+ * 5. Hiç şehir yoksa robot hangi şehri merak ettiğini sorar.
  *
  * Ağ istekleri `viewModelScope` içinde çalışır; ekran kapanırsa yarım kalan istek iptal
  * olur. Cevap gelene kadar [isThinking] true olur ve ekran "yazıyor…" balonu gösterir.
  *
  * @param initialCity Tahmin ekranından açıldıysa o şehir; şehir ekranından açıldıysa null.
+ * @param fallbackCity Soruda ve sohbette şehir yoksa kullanılacak şehir: en son bakılan.
  */
 class AssistantViewModel(
     initialCity: AssistantCity? = null,
     private val cityRepository: CityRepository = OpenMeteoCityRepository(),
-    private val weatherRepository: WeatherRepository = OpenMeteoWeatherRepository()
+    private val weatherRepository: WeatherRepository = OpenMeteoWeatherRepository(),
+    private val fallbackCity: () -> City? = { null }
 ) : ViewModel() {
 
     private var currentCity: AssistantCity? = initialCity
@@ -119,7 +123,9 @@ class AssistantViewModel(
         WeatherAssistant.smallTalk(question, currentCity?.name)?.let { return it }
 
         val candidates = CityMention.candidates(question)
-        val found = findCity(candidates)
+        // Soruda şehir yoksa: önce sohbette konuşulan şehir, o da yoksa en son bakılan şehir.
+        // "Bugün hava nasıl?" böylece kullanıcının baktığı şehir için yanıtlanır.
+        val found = findCity(candidates) ?: (if (currentCity == null && candidates.isEmpty()) loadFallback() else null)
         val city = found ?: currentCity
             ?: return AssistantReply(
                 listOf(
@@ -140,6 +146,13 @@ class AssistantViewModel(
         } else {
             reply
         }
+    }
+
+    /** En son bakılan şehrin tahminini getirir; liste boşsa null. */
+    private suspend fun loadFallback(): AssistantCity? {
+        val city = fallbackCity() ?: return null
+        val forecast = weatherRepository.getForecast(city.latitude, city.longitude)
+        return AssistantCity(name = city.name, subtitle = city.subtitle, forecast = forecast)
     }
 
     /**

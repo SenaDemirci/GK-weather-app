@@ -58,6 +58,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -108,6 +109,7 @@ import com.kampplus.hava.ui.theme.OnSky
 import com.kampplus.hava.ui.theme.ThemeMode
 import com.kampplus.hava.ui.theme.pillBrush
 import com.kampplus.hava.ui.theme.raisedCard
+import com.kampplus.hava.ui.theme.skyBackground
 import java.time.LocalTime
 
 /**
@@ -208,9 +210,12 @@ fun CityScreen(
 ) {
     // Robot sohbeti açık mı; ekran dönünce korunur. Sohbetin kendisi ViewModel'de yaşar.
     var assistantOpen by rememberSaveable { mutableStateOf(false) }
+    val latestRecent = rememberUpdatedState(recentCities.firstOrNull())
     if (assistantOpen) {
         AssistantSheet(
-            viewModel = viewModel(key = "assistant-general") { AssistantViewModel() },
+            // Soruda şehir yoksa robot en son bakılan şehri kullanır. Liste sonradan değişebilir;
+            // her soruda güncel ilk şehir okunsun diye değer değil okuma fonksiyonu verilir.
+            viewModel = viewModel(key = "assistant-general") { AssistantViewModel(fallbackCity = { latestRecent.value }) },
             cityName = null,
             suggestions = GeneralSuggestions,
             onDismiss = { assistantOpen = false }
@@ -232,43 +237,11 @@ fun CityScreen(
             )
         }
     ) { innerPadding ->
-        val sky = MaterialTheme.colorScheme.primaryContainer
-        val ground = MaterialTheme.colorScheme.background
-        val glow = MaterialTheme.colorScheme.primary
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                // Gökyüzü degradesi bütün ekranın arkasında. Alt kısım bile zemin rengine tam
-                // dönmez, hafif mavi kalır; böylece beyaz şehir kartları her yerde zeminden ayrışır.
-                .background(
-                    Brush.verticalGradient(
-                        0f to sky,
-                        0.3f to sky,
-                        1f to lerp(sky, ground, 0.7f)
-                    )
-                )
-                // Arkaya iki yumuşak ışık halesi: sağ üstte güneş parıltısı, sol altta mavi bir ışık.
-                // `drawBehind` içeriğin arkasına çizer; yazıları ve kartları etkilemez.
-                .drawBehind {
-                    drawCircle(
-                        brush = Brush.radialGradient(
-                            listOf(SunGlow.copy(alpha = 0.55f), Color.Transparent),
-                            center = Offset(size.width * 0.92f, size.height * 0.04f),
-                            radius = size.width * 0.5f
-                        ),
-                        radius = size.width * 0.5f,
-                        center = Offset(size.width * 0.92f, size.height * 0.04f)
-                    )
-                    drawCircle(
-                        brush = Brush.radialGradient(
-                            listOf(glow.copy(alpha = 0.16f), Color.Transparent),
-                            center = Offset(size.width * 0.05f, size.height * 0.82f),
-                            radius = size.width * 0.6f
-                        ),
-                        radius = size.width * 0.6f,
-                        center = Offset(size.width * 0.05f, size.height * 0.82f)
-                    )
-                }
+                // Gökyüzü degradesi ve ışık haleleri; bütün ekranlarla ortak (bkz. skyBackground).
+                .skyBackground()
                 .padding(innerPadding),
             // Tablette içerik ortada, en fazla [MaxContentWidth] genişliğinde durur.
             horizontalAlignment = Alignment.CenterHorizontally
@@ -394,9 +367,6 @@ private enum class Greeting(val emoji: String, @StringRes val textRes: Int) {
         }
     }
 }
-
-/** Arka plandaki güneş parıltısının rengi: sıcak, açık bir sarı. */
-private val SunGlow = Color(0xFFFFE08A)
 
 /**
  * Başlıktaki hap biçimli düğme: emoji, kısa etiket ve aşağı ok ("☀️ Açık ▾").

@@ -141,9 +141,10 @@ object WeatherAssistant {
         defaultToSummary: Boolean = false
     ): AssistantReply {
         val text = normalize(question)
-        // Konu bulunamadıysa ama soru bir şehir adı içeriyorsa ("İzmir?") o şehrin özetini veririz.
-        val topic = topicOf(question) ?: if (defaultToSummary) Topic.SUMMARY else null
         val dayQuery = parseDay(text)
+        // Konu bulunamadıysa ama soru bir şehir ("İzmir?") ya da bir gün ("yarın?", yazım hatalı
+        // "bugün hva nsıl") içeriyorsa o günün özetini veririz.
+        val topic = topicOf(question) ?: if (defaultToSummary || dayQuery != null) Topic.SUMMARY else null
         val today = forecast.current.observedAt.toLocalDate()
 
         return when (topic) {
@@ -294,8 +295,8 @@ object WeatherAssistant {
      */
     private fun activity(forecast: Forecast, today: LocalDate, query: DayQuery?): AssistantReply {
         val days = when (query) {
-            DayQuery.Weekend -> forecast.daily.filter { it.date.dayOfWeek in WEEKEND }
-            DayQuery.Week -> listOfNotNull(bestOf(forecast.daily))
+            DayQuery.Weekend -> forecast.week.filter { it.date.dayOfWeek in WEEKEND }
+            DayQuery.Week -> listOfNotNull(bestOf(forecast.week))
             else -> listOfNotNull(resolveSingleDay(forecast, today, query))
         }
         if (days.isEmpty()) return AssistantReply(listOf(ReplyLine(R.string.bot_out_of_range)))
@@ -328,7 +329,7 @@ object WeatherAssistant {
     }
 
     private fun bestDay(forecast: Forecast, query: DayQuery?): AssistantReply {
-        val candidates = if (query == DayQuery.Weekend) forecast.daily.filter { it.date.dayOfWeek in WEEKEND } else forecast.daily
+        val candidates = if (query == DayQuery.Weekend) forecast.week.filter { it.date.dayOfWeek in WEEKEND } else forecast.week
         val best = bestOf(candidates) ?: return AssistantReply(listOf(ReplyLine(R.string.bot_no_data)))
         return AssistantReply(
             listOf(
@@ -401,6 +402,14 @@ object WeatherAssistant {
     }
 
     // endregion
+
+    /**
+     * "Bu hafta", "hafta sonu" ve "en güzel gün" soruları için yalnızca önümüzdeki 7 gün.
+     * Tahmin 15 gün olsa da "bu hafta sonu" ikinci hafta sonunu kapsamamalı.
+     */
+    private val Forecast.week: List<DailyForecast> get() = daily.take(WEEK_DAYS)
+
+    private const val WEEK_DAYS = 7
 
     private val TURKISH: Locale = Locale.forLanguageTag("tr")
     private val HOUR_FORMAT: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")

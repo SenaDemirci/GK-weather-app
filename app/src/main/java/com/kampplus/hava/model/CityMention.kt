@@ -47,7 +47,9 @@ object CityMention {
     fun matches(candidate: String, cityName: String): Boolean {
         val a = WeatherAssistant.normalize(candidate)
         val b = WeatherAssistant.normalize(cityName)
-        return a == b || (a.length >= MIN_LENGTH && b.startsWith(a))
+        // Baş kısmı tutması yalnızca uzun adaylarda kabul edilir: "nsıl" gibi bir yazım
+        // hatası "Nsilambanda" gibi uzak bir yeri getirmesin.
+        return a == b || (a.length >= MIN_PREFIX_LENGTH && b.startsWith(a))
     }
 
     /** "izmirde" → "izmir", "ankaraya" → "ankara". Ek bulunamazsa null. */
@@ -64,16 +66,68 @@ object CityMention {
         private val folded = WeatherAssistant.normalize(base)
 
         /**
-         * Şehir adı olabilir mi? Kısa kelimeler, bilinen soru/gün kelimeleri ve robotun
-         * konu kelimeleri ("yağmur", "piknik"...) elenir. Büyük harfle başlayan bir kelime
-         * konu kelimesine benzese de aday kalır: "Denizli" "deniz" ile başlar ama şehirdir.
+         * Şehir adı olabilir mi? 81 ilin adı her zaman adaydır ("Mersin", "ne dersin"deki
+         * "dersin"e tek harf uzak olsa da). Diğer kelimelerden elenenler:
+         * - kısa kelimeler ve bilinen soru kelimeleri ("hava", "nasıl"),
+         * - gün kelimeleri, ekli halleriyle ve büyük harfle yazılsa bile ("Bugün", "yarınki",
+         *   "bugünkü", "akşamki"): "Bugün" adında bir köy bulunsa da kimse onu sormaz,
+         * - bir soru kelimesinin tek harf hatalı yazımı ("nsıl", "hva"),
+         * - robotun konu kelimeleri ("yağmur", "piknik"). Büyük harfle başlayan kelime konu
+         *   kelimesine benzese de aday kalır: "Denizli" "deniz" ile başlar ama şehirdir.
          */
-        val isCandidate: Boolean = folded.length >= MIN_LENGTH &&
+        val isCandidate: Boolean = folded in PROVINCE_NAMES || folded.length >= MIN_LENGTH &&
             folded !in STOP_WORDS &&
+            DAY_STEMS.none { folded.startsWith(it) } &&
+            !looksLikeStopWord(folded) &&
             (base.first().isUpperCase() || WeatherAssistant.Topic.entries.none { topic -> topic.stems.any { folded.startsWith(it) } })
     }
 
     private const val MIN_LENGTH = 3
+
+    /** 81 ilin sadeleştirilmiş adı; aşağıdaki eleme kurallarından muaftır. */
+    private val PROVINCE_NAMES: Set<String> by lazy { TurkishProvinces.map { WeatherAssistant.normalize(it.name) }.toSet() }
+    private const val MIN_PREFIX_LENGTH = 5
+
+    /** Gün ve zaman kelimelerinin kökleri; ekli halleri de ("bugünkü", "yarına") yakalanır. */
+    private val DAY_STEMS = listOf(
+        "bugun", "yarin", "dun", "simdi", "haftaya", "haftasonu", "sabah", "aksam", "gece", "ogle",
+        "pazartesi", "sali", "carsamba", "persembe", "cuma", "pazar",
+        "today", "tomorrow", "tonight", "yesterday", "monday", "tuesday", "wednesday", "thursday", "friday",
+        "saturday", "sunday", "weekend"
+    )
+
+    /**
+     * Kelime bir soru kelimesinin tek harf eksik, fazla ya da yanlış yazılmış hali mi?
+     * ("nsıl" → "nasıl", "hva" → "hava"). Yalnızca 4 harf ve üstü soru kelimelerine bakılır;
+     * kısa kelimelerde tek harf farkı gerçek şehir adlarını da yakalardı.
+     */
+    private fun looksLikeStopWord(word: String): Boolean =
+        STOP_WORDS.any { it.length >= 4 && it != word && editDistanceAtMostOne(it, word) }
+
+    /** İki kelime arasında en fazla bir harf ekleme, silme ya da değiştirme farkı var mı? */
+    private fun editDistanceAtMostOne(a: String, b: String): Boolean {
+        if (kotlin.math.abs(a.length - b.length) > 1) return false
+        var i = 0
+        var j = 0
+        var edits = 0
+        while (i < a.length && j < b.length) {
+            if (a[i] == b[j]) {
+                i++
+                j++
+                continue
+            }
+            if (++edits > 1) return false
+            when {
+                a.length > b.length -> i++
+                a.length < b.length -> j++
+                else -> {
+                    i++
+                    j++
+                }
+            }
+        }
+        return edits + (a.length - i) + (b.length - j) <= 1
+    }
 
     /** Uzun ekler önce denenir: "istanbuldaki" önce "daki" ile, "da" ile değil. */
     private val SUFFIXES = listOf(

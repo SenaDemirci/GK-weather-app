@@ -1,5 +1,6 @@
 package com.kampplus.hava.ui.map
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -52,6 +54,7 @@ import com.kampplus.hava.ui.component.ErrorView
 import com.kampplus.hava.ui.theme.MaxContentWidth
 import com.kampplus.hava.ui.theme.TemperatureStops
 import com.kampplus.hava.ui.theme.raisedCard
+import com.kampplus.hava.ui.theme.skyBackground
 import kotlin.math.roundToInt
 
 /** Harita ekranının bağlayıcı katmanı; [com.kampplus.hava.ui.city.CityRoute] ile aynı desen. */
@@ -76,12 +79,14 @@ fun MapScreen(
     onOpenProvince: (Province) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    // Arama ekranıyla aynı gökyüzü zemini; Scaffold ve üst çubuk saydam, zemin arkadan görünür.
     Scaffold(
-        modifier = modifier,
+        modifier = modifier.skyBackground(),
+        containerColor = Color.Transparent,
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.map_title)) },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.action_back))
@@ -173,7 +178,10 @@ private fun TemperatureLegend(modifier: Modifier = Modifier) {
 private fun SelectedProvinceCard(selected: ProvinceTemperature?, onOpen: (Province) -> Unit, modifier: Modifier = Modifier) {
     Card(
         modifier = modifier,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.raisedCard),
+        // Beyaz kart; ince mavi çerçeve ve gölgeyle açık mavi arka plandan ayrışır.
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
+        border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.35f))
     ) {
         if (selected == null) {
             Text(

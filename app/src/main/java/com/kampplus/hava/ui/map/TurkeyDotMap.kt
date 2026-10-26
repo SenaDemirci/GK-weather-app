@@ -43,7 +43,7 @@ import kotlin.math.cos
 import kotlin.math.roundToInt
 
 /**
- * Türkiye'nin nokta haritası: mavi denizin üstünde Türkiye'nin kara parçası
+ * Türkiye'nin nokta haritası: beyaz zeminin üstünde gri-mavi Türkiye kara parçası
  * ([TurkeyOutline]), üzerinde her il merkezinin gerçek konumunda sıcaklığına göre
  * renklenmiş bir daire.
  *
@@ -69,8 +69,9 @@ fun TurkeyDotMap(
     var offset by remember { mutableStateOf(Offset.Zero) }
     val textMeasurer = rememberTextMeasurer()
     val seaLabel = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
-    val sea = MaterialTheme.colorScheme.primaryContainer
-    val land = MaterialTheme.colorScheme.raisedCard
+    // Deniz beyaz (kartın kendi rengi); kara hafif gri-mavi, kıyı çizgisi mavi.
+    val sea = MaterialTheme.colorScheme.raisedCard
+    val land = MaterialTheme.colorScheme.surfaceContainerHighest
     val coast = MaterialTheme.colorScheme.primary.copy(alpha = 0.55f)
     val ring = MaterialTheme.colorScheme.onSurface
     val labelColor = MaterialTheme.colorScheme.onSurface

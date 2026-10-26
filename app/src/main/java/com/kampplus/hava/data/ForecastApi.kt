@@ -58,6 +58,8 @@ interface ForecastApi {
         const val DAILY_FIELDS =
             "weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max," +
                 "sunrise,sunset,uv_index_max"
-        const val FORECAST_DAYS = 7
+
+        /** Günlük liste 7 ve 15 günlük sekmelerde gösterilir; 15 gün tek istekte alınır. */
+        const val FORECAST_DAYS = 15
     }
 }

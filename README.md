@@ -2,16 +2,16 @@
 
 Uygulamanın yeni adı **HavaBot**. Kurs projesinin üzerine eklenen özellikler:
 
-- **Yeni tasarım:** gökyüzü mavisi tema, daha büyük ve kalın yazılar, açık / koyu / sistem teması seçimi.
+- **Yeni tasarım:** bütün ekranlarda ortak gökyüzü arka planı, beyaz kartlar, daha büyük ve kalın yazılar, açık / koyu / sistem teması seçimi.
 - **Türkçe ve İngilizce:** uygulama içinden dil seçimi; ilk açılışta Türkçe.
 - **Şehir arama:** sonuçları ülkeye göre süzme; arama metni ekran dönünce korunur.
 - **Son bakılanlar:** tahminine bakılan şehirler şehir ekranında listelenir, tek dokunuşla tekrar açılır; uygulama kapansa da hatırlanır.
-- **Tahmin ekranı:** havaya göre renklenen ana kart ve arkasında canlı hava animasyonları (güneş, bulut, yağmur, kar, şimşek, sis), "Hafif sağanak yağışlı" gibi ayrıntılı hava ifadeleri, saatlik tahminde saat aralığı filtresi (Sabah, Öğle, Akşam, Gece), "Şimdi" ve "Yarın" etiketleri, 7 günlük sıcaklık çubukları.
+- **Tahmin ekranı:** havaya göre renklenen ana kart ve arkasında canlı hava animasyonları (güneş, bulut, yağmur, kar, şimşek, sis), "Hafif sağanak yağışlı" gibi ayrıntılı hava ifadeleri, saatlik tahminde saat aralığı filtresi (Sabah, Öğle, Akşam, Gece), "Şimdi" ve "Yarın" etiketleri, 7 ve 15 günlük tahmin sekmeleri.
 - **Ne giymeli?:** sıcaklık, yağmur, rüzgâr ve UV'ye göre kıyafet önerileri ve "şemsiyeni al" gibi ipuçları.
 - **Güneş ve UV:** gün doğumu, gün batımı, gün uzunluğu ve renkli UV göstergesi.
 - **Polen ve Alerji:** 6 polen türü için uyarı ve 4 günlük renkli tablo (Avrupa ve Türkiye).
 - **Türkiye sıcaklık haritası:** 81 il bugünkü ortalama sıcaklığına göre renkli; bir ile dokunup tahminine geçilir.
-- **Hava Robotu:** ücretsiz, çevrimdışı çalışan, kurallara dayalı sohbet. Bir şehrin yağmurunu, sıcaklığını, kıyafetini, UV'sini sorabilir; "İzmir'de yarın yağmur var mı?" gibi sorulardaki şehri kendisi bulur.
+- **Hava Robotu:** ücretsiz, çevrimdışı çalışan, kurallara dayalı sohbet. Bir şehrin yağmurunu, sıcaklığını, kıyafetini, UV'sini sorabilir; "İzmir'de yarın yağmur var mı?" gibi sorulardaki şehri kendisi bulur, "bugün", "yarın" gibi ifadeleri anlar; şehir yazılmazsa en son bakılan şehri kullanır.
 
 <div align="center">
 

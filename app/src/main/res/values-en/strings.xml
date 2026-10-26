@@ -8,7 +8,7 @@
 
     <!-- City list screen -->
     <string name="city_title">How\'s the weather?</string>
-    <string name="city_header_subtitle">Search a city for current, hourly and 7-day forecasts.</string>
+    <string name="city_header_subtitle">Search a city for current, hourly and 15-day forecasts.</string>
     <string name="greeting_morning">Good morning</string>
     <string name="greeting_day">Good afternoon</string>
     <string name="greeting_evening">Good evening</string>
@@ -45,6 +45,8 @@
     <string name="detail_hourly">Hourly</string>
     <string name="detail_hourly_empty">No forecast falls in this range in the next 24 hours.</string>
     <string name="detail_daily">7-Day</string>
+    <string name="detail_daily_title">Daily Forecast</string>
+    <string name="detail_daily_15">15-Day</string>
     <string name="detail_feels_like">Feels like</string>
     <string name="detail_humidity">Humidity</string>
     <string name="detail_wind">Wind</string>
@@ -153,7 +155,7 @@
     <string name="bot_greeting">Hi! I\'m Weather Bot. Ask me about rain, temperature, what to wear, UV or a good day for a picnic in %1$s.</string>
     <string name="bot_unknown">I can\'t understand that yet. You can ask about rain, temperature, clothes, UV, sunrise/sunset, wind or a good day to go out.</string>
     <string name="bot_thanks">You\'re welcome! I\'m here if you have another question.</string>
-    <string name="bot_out_of_range">I only have the forecast for the next 7 days.</string>
+    <string name="bot_out_of_range">I only have the forecast for the next 15 days.</string>
     <string name="bot_no_data">The forecast has no data for that.</string>
     <string name="bot_rain_now">It\'s raining right now; take your umbrella.</string>
     <string name="bot_rain_at">Rain is expected around %1$s today (%2$d%% chance); take your umbrella.</string>

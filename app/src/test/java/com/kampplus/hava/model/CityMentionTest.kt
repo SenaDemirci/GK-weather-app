@@ -56,6 +56,32 @@ class CityMentionTest {
         assertFalse(CityMention.matches("ankara", "Antalya"))
     }
 
+    @Test
+    fun `gun kelimeleri ekli ve buyuk harfli halleriyle de sehir sayilmaz`() {
+        listOf("Bugün hava nasıl?", "bugünkü hava nasıl", "Yarınki hava", "yarına yağmur var mı", "Today weather", "akşamki hava")
+            .forEach { assertTrue("\"$it\" içinde şehir aranmamalı", CityMention.candidates(it).isEmpty()) }
+    }
+
+    @Test
+    fun `soru kelimesinin yazim hatasi sehir sayilmaz`() {
+        // "nsıl" → "nasıl", "hva" kısa; "havs" → "hava".
+        assertTrue(CityMention.candidates("bugün hava nsıl").isEmpty())
+        assertTrue(CityMention.candidates("yarın havs nasıl").isEmpty())
+    }
+
+    @Test
+    fun `kisa adayin bas kismi uzak bir yeri eslestirmez`() {
+        assertFalse(CityMention.matches("nsıl", "Nsilambanda"))
+        assertTrue(CityMention.matches("Kahraman", "Kahramanmaraş"))
+    }
+
+    @Test
+    fun `81 ilin hicbiri gun ya da yazim hatasi kuralina takilmaz`() {
+        TurkishProvinces.forEach { province ->
+            assertEquals("${province.name} aday olmalı", province.name, CityMention.candidates("${province.name} hava nasıl").firstOrNull())
+        }
+    }
+
     /** Şehir seçmeden açılan sohbetin örnek sorularının her birinde bir şehir bulunmalı. */
     @Test
     fun `genel ornek sorularin hepsinde sehir bulunur`() {

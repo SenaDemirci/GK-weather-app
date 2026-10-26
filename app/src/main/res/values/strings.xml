@@ -13,7 +13,7 @@
 
     <!-- Şehir listesi ekranı -->
     <string name="city_title">Hava nasıl?</string>
-    <string name="city_header_subtitle">Bir şehir ara; anlık, saatlik ve 7 günlük tahmini gör.</string>
+    <string name="city_header_subtitle">Bir şehir ara; anlık, saatlik ve 15 günlük tahmini gör.</string>
     <string name="greeting_morning">Günaydın</string>
     <string name="greeting_day">İyi günler</string>
     <string name="greeting_evening">İyi akşamlar</string>
@@ -50,6 +50,8 @@
     <string name="detail_hourly">Saatlik</string>
     <string name="detail_hourly_empty">Önümüzdeki 24 saatte bu aralığa düşen tahmin yok.</string>
     <string name="detail_daily">7 Günlük</string>
+    <string name="detail_daily_title">Günlük Tahmin</string>
+    <string name="detail_daily_15">15 Günlük</string>
     <string name="detail_feels_like">Hissedilen</string>
     <string name="detail_humidity">Nem</string>
     <string name="detail_wind">Rüzgâr</string>
@@ -159,7 +161,7 @@
     <string name="bot_greeting">Merhaba! Ben Hava Robotu. %1$s için yağmur, sıcaklık, kıyafet, UV ya da piknik için uygun gün sorabilirsin.</string>
     <string name="bot_unknown">Bunu henüz anlayamıyorum. Yağmur, sıcaklık, kıyafet, UV, gün doğumu/batımı, rüzgâr ya da dışarı çıkmaya uygun gün hakkında sorabilirsin.</string>
     <string name="bot_thanks">Rica ederim! Başka bir şey sormak istersen buradayım.</string>
-    <string name="bot_out_of_range">Elimde yalnızca önümüzdeki 7 günün tahmini var.</string>
+    <string name="bot_out_of_range">Elimde yalnızca önümüzdeki 15 günün tahmini var.</string>
     <string name="bot_no_data">Bunun için tahminde veri yok.</string>
     <string name="bot_rain_now">Şu an yağmur yağıyor; şemsiyeni al.</string>
     <string name="bot_rain_at">Bugün saat %1$s civarı yağmur bekleniyor (ihtimal %%%2$d); şemsiyeni al.</string>

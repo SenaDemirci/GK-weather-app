@@ -1,6 +1,7 @@
 package com.kampplus.hava.ui.assistant
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -192,14 +193,21 @@ private fun QuestionInput(onSend: (String) -> Unit) {
         onValueChange = { text = it },
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(16.dp)
+            // Kalın mavi çerçeve: alanın kendi ince kenarı yerine dışarıdan çizilir.
+            .border(width = 2.dp, color = MaterialTheme.colorScheme.primary, shape = CircleShape),
         placeholder = { Text(stringResource(R.string.bot_input_hint)) },
         singleLine = true,
         shape = CircleShape,
+        // Beyaz soru kutusu; çerçeveyi yukarıdaki `border` çizer, alanın kendi kenarı gizlenir.
         colors = OutlinedTextFieldDefaults.colors(
-            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-            focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-            unfocusedBorderColor = Color.Transparent
+            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+            focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+            unfocusedBorderColor = Color.Transparent,
+            focusedBorderColor = Color.Transparent,
+            focusedTrailingIconColor = MaterialTheme.colorScheme.primary,
+            unfocusedTrailingIconColor = MaterialTheme.colorScheme.primary,
+            cursorColor = MaterialTheme.colorScheme.primary
         ),
         trailingIcon = {
             IconButton(onClick = send, enabled = text.isNotBlank()) {
